@@ -127,7 +127,7 @@ INSERT INTO Comments (Content, UID, PID)
 VALUES ('I disagree, but respect your view.', 4, 13);
 
 INSERT INTO Comments (Content, UID, PID) 
-VALUES ('This made my day!', 5, 14);
+VALUES ('This made my day!', 5, 11);
 
 
 --                                      ---------Follows Table----------
@@ -143,6 +143,12 @@ VALUES (3, 4);
 
 INSERT INTO Follows (UID1, UID2) 
 VALUES (4, 5);
+
+INSERT INTO Follows (UID1, UID2) 
+VALUES (5, 6);
+
+INSERT INTO Follows (UID1, UID2) 
+VALUES (7, 1);
 
 
 --                                      ---------Friends Table----------
@@ -195,33 +201,6 @@ VALUES (2, 3, 'Long time no see!');
 INSERT INTO Messages (UID1, UID2, Content) 
 VALUES (3, 2, 'Yeah! We should catch up soon.');
 
---                                      ---------Notifications Table----------
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (2, 1, 'Like', 3, 'john_doe liked your post.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (3, 2, 'Comment', 4, 'jane_smith commented on your post.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (5, 4, 'Like', 6, 'michael_b liked your post.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (6, 5, 'Follow', 1, 'sarah_lee started following you.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (7, 6, 'Comment', 7, 'david_k commented on your post.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (1, 7, 'Follow', 8, 'emily_w started following you.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (3, 4, 'Like', 10, 'michael_b liked your post.');
-
-INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (4, 5, 'Comment', 11, 'sarah_lee commented on your post.');
-
-
 --                                      ---------Likes Table----------
 
 INSERT INTO Likes (UID, PID) 
@@ -234,7 +213,7 @@ INSERT INTO Likes (UID, PID)
 VALUES (3, 5);
 
 INSERT INTO Likes (UID, PID) 
-VALUES (4, 6);
+VALUES (4, 10);
 
 INSERT INTO Likes (UID, PID) 
 VALUES (5, 7);
@@ -253,6 +232,32 @@ VALUES (2, 11);
 
 INSERT INTO Likes (UID, PID) 
 VALUES (3, 12);
+
+--                                      ---------Notifications Table----------
+
+INSERT INTO Notification (UID, SID, Type, PID, Content) 
+VALUES (3, 1, 'Like', 3, 'john_doe liked your post.');
+
+INSERT INTO Notification (UID, SID, Type, PID, Content) 
+VALUES (4, 2, 'Comment', 4, 'jane_smith commented on your post.');
+
+INSERT INTO Notification (UID, SID, Type, PID, Content) 
+VALUES (6, 4, 'Like', 6, 'michael_b liked your post.');
+
+INSERT INTO Notification (UID, SID, Type, Content) 
+VALUES (6, 5, 'Follow', 'sarah_lee started following you.');
+
+INSERT INTO Notification (UID, SID, Type, PID, Content) 
+VALUES (1, 6, 'Comment', 8, 'david_k commented on your post.');
+
+INSERT INTO Notification (UID, SID, Type, Content) 
+VALUES (1, 7, 'Follow', 'emily_w started following you.');
+
+INSERT INTO Notification (UID, SID, Type, PID, Content) 
+VALUES (3, 4, 'Like', 10, 'michael_b liked your post.');
+
+INSERT INTO Notification (UID, SID, Type, PID, Content) 
+VALUES (4, 5, 'Comment', 11, 'sarah_lee commented on your post.');
 
 --                                      ---------Reports Table----------
 
