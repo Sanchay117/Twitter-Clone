@@ -27,7 +27,7 @@ CREATE TABLE Admins (
 );
 
 -- Table: Currently_Banned
-CREATE TABLE Currently_Banned (
+CREATE TABLE Banned (
     Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Reason TEXT NOT NULL,
     UID INT NOT NULL,
