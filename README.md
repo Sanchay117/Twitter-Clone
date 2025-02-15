@@ -1,5 +1,4 @@
 ### DBMS Group Project (Twitter Clone)
-#### Sanchay Singh , Keerat Singh, Ryan Bhan, Harsh Sharma
 
 PostgreSQL can execute these scripts using:
 ```
