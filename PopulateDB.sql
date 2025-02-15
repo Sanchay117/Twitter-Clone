@@ -207,7 +207,7 @@ INSERT INTO Notification (UID, SID, Type, PID, Content)
 VALUES (5, 4, 'Like', 6, 'michael_b liked your post.');
 
 INSERT INTO Notification (UID, SID, Type, PID, Content) 
-VALUES (6, 5, 'Follow', 0, 'sarah_lee started following you.');
+VALUES (6, 5, 'Follow', 1, 'sarah_lee started following you.');
 
 INSERT INTO Notification (UID, SID, Type, PID, Content) 
 VALUES (7, 6, 'Comment', 7, 'david_k commented on your post.');
@@ -288,13 +288,13 @@ VALUES (3, 13, 'Scam or fraud');
 
 --                                      ---------Currently Banned Table----------
 
-INSERT INTO Currently_Banned (Reason, UID, AID) 
+INSERT INTO Banned (Reason, UID, AID) 
 VALUES ('Violation of community guidelines', 3, 1);
 
-INSERT INTO Currently_Banned (Reason, UID, AID) 
+INSERT INTO Banned (Reason, UID, AID) 
 VALUES ('Spamming inappropriate content', 5, 2);
 
-INSERT INTO Currently_Banned (Reason, UID, AID) 
+INSERT INTO Banned (Reason, UID, AID) 
 VALUES ('Harassment and abusive behavior', 7, 3);
 
 
