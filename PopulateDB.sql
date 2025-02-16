@@ -29,38 +29,38 @@ VALUES ('Exploring the mountains today!', 1);
 INSERT INTO Posts (Content, UID) 
 VALUES ('Just finished an amazing book. Highly recommend!', 2);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Listening to my favorite band on repeat.', 3);
+INSERT INTO Posts (Content, UID, Likes , Views) 
+VALUES ('Listening to my favorite band on repeat.', 3, 1 , 5);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Had a great workout session!', 4);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Had a great workout session!', 4, 1, 3);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Trying out a new recipe tonight.', 5);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Trying out a new recipe tonight.', 5, 1, 2);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Game night with friends!', 6);
+INSERT INTO Posts (Content, UID, Views) 
+VALUES ('Game night with friends!', 6, 3);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Meditation is the key to a peaceful mind.', 7);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Meditation is the key to a peaceful mind.', 7, 1, 3);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Sunsets at the beach are breathtaking.', 1);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Sunsets at the beach are breathtaking.', 1, 1, 1);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Book recommendations, anyone?', 2);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Book recommendations, anyone?', 2, 1, 3);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('New tech gadgets are so exciting!', 3);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('New tech gadgets are so exciting!', 3, 2, 3);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Just ran my first marathon!', 4);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Just ran my first marathon!', 4, 1, 2);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Baking cookies for the weekend.', 5);
+INSERT INTO Posts (Content, UID, Likes, Views) 
+VALUES ('Baking cookies for the weekend.', 5, 1, 1);
 
-INSERT INTO Posts (Content, UID) 
-VALUES ('Completed my comic book collection!', 6);
+INSERT INTO Posts (Content, UID, Views) 
+VALUES ('Completed my comic book collection!', 6, 1);
 
 INSERT INTO Posts (Content, UID) 
 VALUES ('Feeling grateful today.', 7);
