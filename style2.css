@@ -20,3 +20,15 @@ html, body {
     cursor: pointer;
     color: white;
 }
+
+.container{
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card{
+    margin-bottom: 3rem;
+}
