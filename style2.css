@@ -11,3 +11,12 @@ html, body {
     height: 100%;
     margin: 0;
 }
+
+#search{
+    color: white;
+}
+
+.theme{
+    cursor: pointer;
+    color: white;
+}
