@@ -1,0 +1,13 @@
+:root{
+    --white:#ecf0f1;
+    --black:#2c3e50;
+    --blue:#3498db;
+    --dark-blue:#2980b9;
+    --dark-black:#2f3542;
+    --dark-white:#f1f2f6;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
