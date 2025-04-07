@@ -1,27 +1,28 @@
-:root{
-    --white:#ecf0f1;
-    --black:#2c3e50;
-    --blue:#3498db;
-    --dark-blue:#2980b9;
-    --dark-black:#2f3542;
-    --dark-white:#f1f2f6;
+:root {
+    --white: #ecf0f1;
+    --black: #2c3e50;
+    --blue: #3498db;
+    --dark-blue: #2980b9;
+    --dark-black: #2f3542;
+    --dark-white: #f1f2f6;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
 }
 
-#search{
+#search {
     color: white;
 }
 
-.theme{
+.theme {
     cursor: pointer;
     color: white;
 }
 
-.container{
+.container {
     width: 50%;
     display: flex;
     justify-content: center;
@@ -29,11 +30,21 @@ html, body {
     align-items: center;
 }
 
-.card{
+.card {
     margin-bottom: 3rem;
 }
 
-.post{
+.post {
     width: 500px;
-    height: 400px;
+}
+
+.date {
+    font-weight: 200;
+    font-size: 0.8rem;
+}
+
+.info {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
 }

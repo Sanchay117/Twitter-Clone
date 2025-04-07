@@ -124,6 +124,25 @@ app.get('/api/user', (req, res) => {
     res.json({ username: req.session.user.username });
 });
 
+app.get('/api/posts', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'Not logged in' });
+    }
+
+    const { data, error } = await supabase.from('posts').select(`
+    *,
+    users:uid (
+      username
+    )
+  	`);
+
+    if (error) {
+        return res.status(500).send('Error Joining Tables');
+    } else {
+        res.json({ data: data });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server started on PORT: ${PORT}`);
 });
