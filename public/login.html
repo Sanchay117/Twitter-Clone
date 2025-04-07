@@ -15,11 +15,11 @@
     <form action="/login" method="post">
       <h3 class="mb-3 text-center">Login</h3>
       <div class="form-floating mb-3">
-        <input type="text" name="username" class="form-control" id="floatingInput" placeholder="BraveFart69">
+        <input type="text" required name="username" class="form-control" id="floatingInput" placeholder="BraveFart69">
         <label for="username">Username</label>  
       </div>
       <div class="form-floating mb-3">
-        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+        <input type="password" required name="password" class="form-control" id="floatingPassword" placeholder="Password">
         <label for="password">Password</label>
       </div>
       <div class="mb-3 form-check">
@@ -31,7 +31,7 @@
       </div>
 
       <div class="text-center">
-        Don't Have An Account? <p><a href="signUp.html" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Sign Up</a></p>
+        Don't Have An Account? <p><a href="/signup" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Sign Up</a></p>
       </div>
     </form>
   </div>

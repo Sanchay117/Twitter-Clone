@@ -8,3 +8,5 @@ themeToggle.addEventListener('click', () => {
     }else themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
 });
 
+const params = new URLSearchParams(window.location.search);
+const username = params.get("username");

@@ -12,26 +12,26 @@
   <h1><i class="fa-solid fa-dumpster-fire"></i> DumpsterFire </h1>
     
   <div id="login">
-    <form>
+    <form action="/signup" method="post">
       <h3 class="mb-3 text-center">Sign Up</h3>
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInput" placeholder="BraveFart69">
-        <label for="floatingInput">Username</label>  
+        <input type="text" name="username" required class="form-control" id="floatingInput" placeholder="BraveFart69">
+        <label for="username">Username</label>  
       </div>
       <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="floatingInput" placeholder="BraveFart69@gmail.com">
-        <label for="floatingInput">Email</label>  
+        <input type="email" name="email" required class="form-control" id="floatingInput" placeholder="BraveFart69@gmail.com">
+        <label for="email">Email</label>  
       </div>
       <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-        <label for="floatingPassword">Password</label>
+        <input type="password" name="password" required class="form-control" id="floatingPassword" placeholder="Password">
+        <label for="password">Password</label>
       </div>
       <div class="mb-2 text-center">
-        <a class="btn btn-primary" href="home.html">Sign Up</a>
+        <input type="submit" value="Sign Up" class="btn btn-primary">
       </div>
 
       <div class="text-center">
-        Already Have An Account? <p><a href="login.html" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Log In</a></p>
+        Already Have An Account? <p><a href="/login" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Log In</a></p>
       </div>
     </form>
   </div>
