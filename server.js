@@ -50,7 +50,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password , dob } = req.body;
   
     // 1. Check if user already exists
     const { data: existingUser, error: fetchError } = await supabase
@@ -71,7 +71,7 @@ app.post("/signup", async (req, res) => {
     // 2. Insert new user
     const { error: insertError } = await supabase
       .from("users")
-      .insert([{ username, email, password }]);
+      .insert([{ username, email, password, dob }]);
   
     if (insertError) {
       console.error(insertError);
