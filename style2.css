@@ -32,3 +32,8 @@ html, body {
 .card{
     margin-bottom: 3rem;
 }
+
+.post{
+    width: 500px;
+    height: 400px;
+}
