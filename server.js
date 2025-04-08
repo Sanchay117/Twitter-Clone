@@ -63,7 +63,8 @@ app.post('/login', async (req, res) => {
         return res.send('Invalid credentials');
     }
 
-    req.session.user = { username }; // Store in session
+    const ID = data.uid;
+    req.session.user = { username, ID }; // Store in session
     res.redirect('/home');
 });
 
@@ -121,7 +122,7 @@ app.get('/api/user', (req, res) => {
         return res.status(401).json({ error: 'Not logged in' });
     }
 
-    res.json({ username: req.session.user.username });
+    res.json({ username: req.session.user.username, ID: req.session.user.ID });
 });
 
 app.get('/api/posts', async (req, res) => {
@@ -147,7 +148,6 @@ app.get('/create', (req, res) => {
     // if (!req.session.user) {
     //     return res.status(401).json({ error: 'Not logged in' });
     // }
-    console.log(req);
     res.sendFile(__dirname + '/public/createPost.html');
 });
 

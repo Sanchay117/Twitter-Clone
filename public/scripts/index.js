@@ -12,6 +12,7 @@ themeToggle.addEventListener('click', () => {
 });
 
 let username;
+let uID;
 const container = document.querySelector('.container');
 
 function formatTimeAgo(datetimeStr) {
@@ -48,6 +49,7 @@ function formatTimeAgo(datetimeStr) {
         if (!userRes.ok) throw new Error('Not logged in');
         const userData = await userRes.json();
         username = userData.username;
+        uID = userData.ID;
 
         const postsRes = await fetch('/api/posts');
         if (!postsRes.ok) throw new Error('Not logged in');
