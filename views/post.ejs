@@ -90,6 +90,24 @@
                     </div>
                     <div class="comments mt-3">
                         <p>Comments</p>
+                        <% for( let index = 0; index < comments.length; index++
+                        ) { %>
+                        <div class="comment card">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <%= comments[index].users.username %><span
+                                        class="date"
+                                    >
+                                        <%= comments[index].date %>
+                                    </span>
+                                </h6>
+                                <p class="card-text">
+                                    <%= comments[index].content %>
+                                </p>
+                            </div>
+                        </div>
+
+                        <% } %>
                     </div>
                 </div>
             </div>

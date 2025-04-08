@@ -127,7 +127,7 @@ app.get('/post/:id', async (req, res) => {
         )
         .eq('pid', postId);
 
-    const { data2, error2 } = await supabase
+    const { data: data2, error: error2 } = await supabase
         .from('comments')
         .select(
             `
@@ -137,7 +137,7 @@ app.get('/post/:id', async (req, res) => {
           )
         `
         )
-        .eq('pid', postId); // p is your post ID
+        .eq('pid', postId);
 
     if (error || !data) {
         return res.status(404).send('Post not found');
@@ -149,10 +149,13 @@ app.get('/post/:id', async (req, res) => {
 
     data = data[0];
     const date = formatTimeAgo(data.date);
+    data2.forEach((el) => {
+        el.date = formatTimeAgo(el.date).timeAgo;
+    });
 
     console.log(data2);
 
-    res.render('post', { post: data, timeAgo: date.timeAgo }); // assuming you're using EJS/Pug/etc.
+    res.render('post', { post: data, timeAgo: date.timeAgo, comments: data2 }); // assuming you're using EJS/Pug/etc.
 });
 
 // Logout route
