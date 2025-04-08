@@ -13,15 +13,15 @@ themeToggle.addEventListener('click', () => {
 
 let username, uID;
 
-(async () => {
-    try {
-        const userRes = await fetch('/api/user');
-        if (!userRes.ok) throw new Error('Not logged in');
-        const userData = await userRes.json();
-        username = userData.username;
-        uID = userData.ID;
-    } catch (err) {
-        console.log(err);
-        window.location.href = '/login'; // Redirect if any fetch fails
-    }
-})();
+// (async () => {
+//     try {
+//         const userRes = await fetch('/api/user');
+//         if (!userRes.ok) throw new Error('Not logged in');
+//         const userData = await userRes.json();
+//         username = userData.username;
+//         uID = userData.ID;
+//     } catch (err) {
+//         console.log(err);
+//         window.location.href = '/login'; // Redirect if any fetch fails
+//     }
+// })();
