@@ -32,36 +32,3 @@ let username, uID;
         window.location.href = '/login'; // Redirect if any fetch fails
     }
 })();
-
-// const form = document.querySelector('form');
-// form.addEventListener('submit', async (e) => {
-//     e.preventDefault(); // Prevent normal form submission
-
-//     const tweet = tweetInput.value;
-
-//     try {
-//         const res = await fetch('/create', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//                 tweet: tweet,
-//                 // You can also include date or user data here if needed
-//             }),
-//         });
-
-//         if (!res.ok) throw new Error('Failed to post tweet');
-
-//         const data = await res.json(); // Parse the response JSON
-
-//         // Optionally redirect or clear form
-//         document.querySelector('h1').textContent = 'Tweet Posted Successfully';
-//         console.log('Posted');
-//         form.style.display = 'none';
-//     } catch (err) {
-//         console.error(err);
-//         alert('Something went wrong');
-//         window.href = '/home';
-//     }
-// });
