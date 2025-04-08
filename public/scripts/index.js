@@ -14,6 +14,34 @@ themeToggle.addEventListener('click', () => {
 let username;
 const container = document.querySelector('.container');
 
+function formatTimeAgo(datetimeStr) {
+    const now = new Date();
+    const date = new Date(datetimeStr); // handles ISO-like formats fine
+
+    // 1. Format the datetime nicely
+    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+
+    // 2. Calculate "time ago"
+    const diffMs = now - date;
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+
+    let timeAgo = '';
+    if (diffSec < 60) {
+        timeAgo = `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
+    } else if (diffMin < 60) {
+        timeAgo = `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+    } else if (diffHr < 24) {
+        timeAgo = `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
+    } else {
+        timeAgo = `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
+    }
+
+    return { formattedDate, timeAgo };
+}
+
 (async () => {
     try {
         const userRes = await fetch('/api/user');
@@ -29,11 +57,11 @@ const container = document.querySelector('.container');
         posts.forEach((post) => {
             const postCard = document.createElement('div');
             postCard.className = 'card post';
-
+            const { formattedDate, timeAgo } = formatTimeAgo(post.date);
             postCard.innerHTML = `
               <div class="card-body">
                 <h5 class="card-title">
-                  ${post.users.username} <span class="date">${post.date}</span>
+                  ${post.users.username} <span class="date">${timeAgo}</span>
                 </h5>
                 <p class="card-text">
                   ${post.content}
