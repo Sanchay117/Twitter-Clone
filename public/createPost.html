@@ -68,9 +68,30 @@
             </div>
         </nav>
 
-        <div>
+        <div class="mb-3">
             <h1 class="display-6">Create A Post</h1>
         </div>
+
+        <form action="/create" method="post">
+            <div class="mb-3">
+                <label for="tweet" class="form-label">Twit</label>
+                <textarea
+                    class="form-control"
+                    id="tweet"
+                    rows="3"
+                    name="tweet"
+                    required
+                    maxlength="250"
+                    style="min-height: 120px"
+                ></textarea>
+                <div id="charCount" class="form-text">0 / 250</div>
+                <div class="submit mt-3">
+                    <button type="submit" class="btn btn-primary submit-btn">
+                        Post
+                    </button>
+                </div>
+            </div>
+        </form>
 
         <script src="bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
         <script

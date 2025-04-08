@@ -16,6 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // Middleware
 app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Session middleware (MUST come after express.urlencoded)
 app.use(
@@ -144,10 +145,36 @@ app.get('/api/posts', async (req, res) => {
     }
 });
 
+app.post('/create', async (req, res) => {
+    const uID = req.session.user.ID;
+    const { tweet } = req.body;
+
+    if (!tweet || tweet.length > 250) {
+        return res
+            .status(400)
+            .json({ error: 'Tweet must be 250 characters or less' });
+    }
+
+    const { error } = await supabase.from('posts').insert([
+        {
+            uid: uID,
+            content: tweet,
+            views: 1,
+        },
+    ]);
+
+    if (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Failed to create post' });
+    }
+
+    res.redirect('/home');
+});
+
 app.get('/create', (req, res) => {
-    // if (!req.session.user) {
-    //     return res.status(401).json({ error: 'Not logged in' });
-    // }
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
     res.sendFile(__dirname + '/public/createPost.html');
 });
 
