@@ -143,6 +143,14 @@ app.get('/api/posts', async (req, res) => {
     }
 });
 
+app.get('/create', (req, res) => {
+    // if (!req.session.user) {
+    //     return res.status(401).json({ error: 'Not logged in' });
+    // }
+    console.log(req);
+    res.sendFile(__dirname + '/public/createPost.html');
+});
+
 app.listen(PORT, () => {
     console.log(`Server started on PORT: ${PORT}`);
 });
