@@ -153,8 +153,6 @@ app.get('/post/:id', async (req, res) => {
         el.date = formatTimeAgo(el.date).timeAgo;
     });
 
-    console.log(data2);
-
     res.render('post', { post: data, timeAgo: date.timeAgo, comments: data2 }); // assuming you're using EJS/Pug/etc.
 });
 
