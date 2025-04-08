@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import session from 'express-session';
+import path from 'path';
 
 // Initialize environment variables
 dotenv.config();
@@ -14,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Middleware
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -26,6 +27,9 @@ app.use(
         saveUninitialized: false,
     })
 );
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Supabase client
 const supabase = createClient(process.env.DB_URL, process.env.API_KEY);
@@ -108,6 +112,49 @@ app.post('/signup', async (req, res) => {
     res.redirect('/home');
 });
 
+app.get('/post/:id', async (req, res) => {
+    const postId = req.params.id;
+
+    let { data, error } = await supabase
+        .from('posts')
+        .select(
+            `
+        *,
+        users:uid (
+          username
+        )
+        `
+        )
+        .eq('pid', postId);
+
+    const { data2, error2 } = await supabase
+        .from('comments')
+        .select(
+            `
+          *,
+          users:uid (
+            username
+          )
+        `
+        )
+        .eq('pid', postId); // p is your post ID
+
+    if (error || !data) {
+        return res.status(404).send('Post not found');
+    }
+
+    if (error2) {
+        return res.status(404).send(error2);
+    }
+
+    data = data[0];
+    const date = formatTimeAgo(data.date);
+
+    console.log(data2);
+
+    res.render('post', { post: data, timeAgo: date.timeAgo }); // assuming you're using EJS/Pug/etc.
+});
+
 // Logout route
 app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -181,3 +228,47 @@ app.get('/create', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server started on PORT: ${PORT}`);
 });
+
+function formatTimeAgo(datetimeStr) {
+    const now = new Date();
+
+    // Fix datetime string by trimming to milliseconds (first 3 digits after dot)
+    const safeStr = datetimeStr.replace(/\.(\d{3})\d*/, '.$1');
+
+    const date = new Date(safeStr);
+    if (isNaN(date)) {
+        return {
+            formattedDate: 'Invalid date',
+            timeAgo: 'some time ago',
+        };
+    }
+
+    // 1. Format: e.g., Apr 8, 2025 12:42
+    const formattedDate = date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    // 2. Time ago
+    const diffMs = now - date;
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+
+    let timeAgo = '';
+    if (diffSec < 60) {
+        timeAgo = `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
+    } else if (diffMin < 60) {
+        timeAgo = `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+    } else if (diffHr < 24) {
+        timeAgo = `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
+    } else {
+        timeAgo = `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
+    }
+
+    return { formattedDate, timeAgo };
+}

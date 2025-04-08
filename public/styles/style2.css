@@ -32,6 +32,7 @@ body {
 
 .card {
     margin-bottom: 3rem;
+    cursor: pointer;
 }
 
 .post {
@@ -90,4 +91,8 @@ body {
     position: fixed;
     right: 0;
     bottom: 0;
+}
+
+.comments {
+    font-weight: 500;
 }
