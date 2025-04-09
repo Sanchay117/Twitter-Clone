@@ -103,3 +103,27 @@ body {
 .fa-share-nodes {
     color: dodgerblue;
 }
+
+.post-box .form-control {
+    background-color: var(--tweet-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.75rem;
+}
+
+.post-box .form-control:focus {
+    background-color: var(--tweet-bg);
+    color: var(--text-color);
+    border-color: dodgerblue;
+    outline: none;
+    box-shadow: none;
+}
+
+.post-box .form-label {
+    color: var(--text-color);
+}
+
+.post-box .form-text {
+    color: var(--timestamp-color);
+}

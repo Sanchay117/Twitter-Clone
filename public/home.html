@@ -40,14 +40,37 @@
 
                 <!-- Main Feed -->
                 <div class="col-8 middle-col">
-                    <div class="post-box">
-                        <textarea
-                            rows="3"
-                            placeholder="What's happening?"
-                        ></textarea>
-                        <div class="text-end mt-2">
-                            <button class="btn btn-primary btn-sm">Post</button>
-                        </div>
+                    <div class="post-box mb-4">
+                        <form class="form" action="/create" method="post">
+                            <div class="mb-3">
+                                <label for="tweet" class="form-label"
+                                    >Twit</label
+                                >
+                                <textarea
+                                    class="form-control"
+                                    id="tweet"
+                                    name="tweet"
+                                    rows="3"
+                                    required
+                                    maxlength="250"
+                                    placeholder="What's happening?"
+                                    style="min-height: 120px"
+                                ></textarea>
+                                <div id="charCount" class="form-text mt-1">
+                                    0 / 250
+                                </div>
+                                <div
+                                    class="submit mt-3 d-flex justify-content-end"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary submit-btn"
+                                    >
+                                        Post
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
                     <div class="feed"></div>
@@ -67,5 +90,6 @@
         ></script>
         <script src="scripts/themeChange.js"></script>
         <script src="scripts/home.js"></script>
+        <script src="scripts/createPost.js"></script>
     </body>
 </html>

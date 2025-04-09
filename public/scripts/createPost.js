@@ -5,8 +5,6 @@ tweetBox.addEventListener('input', () => {
     charCount.textContent = `${tweetBox.value.length} / 250`;
 });
 
-let username, uID;
-
 (async () => {
     try {
         const userRes = await fetch('/api/user');
