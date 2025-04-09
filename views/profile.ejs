@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= profile.username %>'s Profile</title>
+        <link
+            rel="stylesheet"
+            href="/bootstrap-5.3.3-dist/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" href="/styles/home.css" />
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Left Sidebar -->
+                <div class="col-2 left-col">
+                    <h4 class="mb-4">
+                        <i class="fa-brands fa-twitter"></i> Twit
+                    </h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="/home" class="nav-link text-light">Home</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/profile" class="nav-link text-light"
+                                >Profile</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/friends" class="nav-link text-light"
+                                >Friends</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/messages" class="nav-link text-light"
+                                >Messages</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/settings" class="nav-link text-light"
+                                >Settings</a
+                            >
+                        </li>
+                    </ul>
+                    <button id="toggleTheme" class="btn btn-outline-light mt-3">
+                        Toggle Theme
+                    </button>
+                </div>
+
+                <!-- Profile Info -->
+                <div class="col-8 middle-col">
+                    <div
+                        class="card mb-4"
+                        style="
+                            background-color: var(--tweet-bg);
+                            color: var(--text-color);
+                        "
+                    >
+                        <div class="card-body">
+                            <h3>
+                                <small class="text-light"
+                                    >@<%= profile.username %></small
+                                >
+                            </h3>
+                            <p><%= profile.bio %></p>
+                            <p>
+                                <strong>Date of Birth:</strong> <%= profile.dob
+                                %>
+                            </p>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <form
+                                    method="POST"
+                                    action="/follow/<%= profile.uid %>"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm <%= isFollowing ? 'btn-danger' : 'btn-success' %>"
+                                    >
+                                        <%= isFollowing ? 'Unfollow' : 'Follow'
+                                        %>
+                                    </button>
+                                </form>
+                                <a
+                                    href="/chat/<%= profile.uid %>"
+                                    class="btn btn-sm btn-primary"
+                                    >Send Message</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mutual Friends -->
+                    <div class="mb-4">
+                        <h5>Mutual Friends</h5>
+                        <% if (mutualFriends.length === 0) { %>
+                        <p class="text-muted">No mutual friends</p>
+                        <% } else { %>
+                        <ul class="list-group">
+                            <% mutualFriends.forEach(f => { %>
+                            <li
+                                class="list-group-item"
+                                style="
+                                    background-color: var(--tweet-bg);
+                                    color: var(--text-color);
+                                "
+                            >
+                                <strong><%= f.full_name %></strong> @<%=
+                                f.username %>
+                            </li>
+                            <% }) %>
+                        </ul>
+                        <% } %>
+                    </div>
+
+                    <!-- Recent Posts -->
+                    <div>
+                        <h5>Recent Posts</h5>
+                        <% if (recentPosts.length === 0) { %>
+                        <p class="text-muted">No posts yet.</p>
+                        <% } else { %> <% recentPosts.forEach(post => { %>
+                        <div
+                            class="card mb-2"
+                            style="
+                                background-color: var(--tweet-bg);
+                                color: var(--text-color);
+                            "
+                        >
+                            <div class="card-body">
+                                <p><%= post.content %></p>
+                                <small class="text-muted"
+                                    ><%= new
+                                    Date(post.created_at).toLocaleString()
+                                    %></small
+                                >
+                            </div>
+                        </div>
+                        <% }) %> <% } %>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="col-2 right-col"></div>
+            </div>
+        </div>
+
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/420dd176dc.js"
+            crossorigin="anonymous"
+        ></script>
+        <script src="/scripts/themeChange.js"></script>
+    </body>
+</html>

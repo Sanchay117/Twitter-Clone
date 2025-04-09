@@ -261,6 +261,114 @@ app.get('/friends', async (req, res) => {
     res.render('friends', { friends: friendUsers });
 });
 
+app.get('/profile/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    const currentUserId = req.session.user.ID;
+    const profileUserId = req.params.id;
+
+    if (!currentUserId) return res.redirect('/login');
+
+    // 1. Fetch user profile
+    const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .select('uid, username, bio, dob')
+        .eq('uid', profileUserId)
+        .single();
+
+    if (profileError || !profile) {
+        console.error('Profile fetch error:', profileError?.message);
+        return res.status(404).send('User not found');
+    }
+
+    // 2. Check if current user follows this profile
+    const { data: followData, error: followError } = await supabase
+        .from('follows')
+        .select('uid1')
+        .eq('uid1', currentUserId)
+        .eq('uid2', profileUserId);
+
+    const isFollowing = followData && followData.length > 0;
+
+    // 3. Mutual friends
+    const { data: currentUserFriends } = await supabase
+        .from('friends')
+        .select('uid1, uid2')
+        .or(`uid1.eq.${currentUserId},uid2.eq.${currentUserId}`);
+
+    const currentFriendIds = currentUserFriends.map((f) =>
+        f.uid1 === currentUserId ? f.uid2 : f.uid1
+    );
+
+    const { data: profileUserFriends } = await supabase
+        .from('friends')
+        .select('uid1, uid2')
+        .or(`uid1.eq.${profileUserId},uid2.eq.${profileUserId}`);
+
+    const profileFriendIds = profileUserFriends.map((f) =>
+        f.uid1 === profileUserId ? f.uid2 : f.uid1
+    );
+
+    const mutualIds = currentFriendIds.filter((id) =>
+        profileFriendIds.includes(id)
+    );
+
+    const { data: mutualFriends } = await supabase
+        .from('users')
+        .select('uid, username, full_name')
+        .in('uid', mutualIds);
+
+    // 4. Recent posts
+    const { data: recentPosts, error: postsError } = await supabase
+        .from('posts')
+        .select('content, created_at')
+        .eq('user_id', profileUserId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+    res.render('profile', {
+        profile,
+        isFollowing,
+        mutualFriends: mutualFriends || [],
+        recentPosts: recentPosts || [],
+    });
+});
+
+app.post('/follow/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    const currentUserId = req.session.user.ID;
+    if (!currentUserId) return res.redirect('/');
+    const targetId = req.params.id;
+
+    if (!currentUserId || currentUserId === targetId) {
+        return res.redirect('/profile/' + targetId);
+    }
+
+    const { data: existing } = await supabase
+        .from('follows')
+        .select()
+        .eq('uid1', currentUserId)
+        .eq('uid2', targetId);
+
+    if (existing && existing.length > 0) {
+        // Unfollow
+        await supabase
+            .from('follows')
+            .delete()
+            .match({ uid1: currentUserId, uid2: targetId });
+    } else {
+        // Follow
+        await supabase
+            .from('follows')
+            .insert([{ uid1: currentUserId, uid2: targetId }]);
+    }
+
+    res.redirect('/profile/' + targetId);
+});
+
 // GET /messages
 app.get('/messages', async (req, res) => {
     if (!req.session.user) {
