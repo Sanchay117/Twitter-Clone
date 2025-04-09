@@ -218,6 +218,49 @@ app.post('/post/:id', async (req, res) => {
     }
 });
 
+app.get('/friends', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    const userId = req.session.user.ID;
+    if (!userId) return res.redirect('/login');
+
+    // Fetch both UID1 and UID2 where user is involved
+    const { data: friendsData, error: friendsError } = await supabase
+        .from('friends')
+        .select('uid1, uid2')
+        .or(`uid1.eq.${userId},uid2.eq.${userId}`);
+
+    if (friendsError) {
+        console.error('Error fetching friends:', friendsError.message);
+        return res.status(500).send('Error loading friends');
+    }
+
+    // Extract the friend IDs (exclude self)
+    const friendIds = friendsData.map((f) =>
+        f.uid1 === userId ? f.uid2 : f.uid1
+    );
+
+    // console.log(friendIds);
+
+    // if (friendIds.length === 0) return res.render('friends', { friends: [] });
+
+    const { data: friendUsers, error: usersError } = await supabase
+        .from('users')
+        .select('uid, username, bio')
+        .in('uid', friendIds);
+
+    // console.log(friendUsers);
+
+    if (usersError) {
+        console.error('Error fetching user details:', usersError.message);
+        return res.status(500).send('Error loading friends info');
+    }
+
+    console.log(friendUsers);
+    res.render('friends', { friends: friendUsers });
+});
+
 // Logout route
 app.post('/logout', (req, res) => {
     req.session.destroy((err) => {

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Friends</title>
+        <link
+            rel="stylesheet"
+            href="/bootstrap-5.3.3-dist/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" href="/styles/home.css" />
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Left Sidebar -->
+                <div class="col-2 left-col">
+                    <h4 class="mb-4">
+                        <i class="fa-brands fa-twitter"></i> Twit
+                    </h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="/home" class="nav-link text-light">Home</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/profile" class="nav-link text-light"
+                                >Profile</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a
+                                href="/friends"
+                                class="nav-link text-light active"
+                                >Friends</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/messages" class="nav-link text-light"
+                                >Messages</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/settings" class="nav-link text-light"
+                                >Settings</a
+                            >
+                        </li>
+                    </ul>
+                    <button id="toggleTheme" class="btn btn-outline-light mt-3">
+                        Toggle Theme
+                    </button>
+                </div>
+
+                <!-- Friends List -->
+                <div class="col-8 middle-col">
+                    <h3 class="mb-4">Your Friends</h3>
+                    <% if (friends.length === 0) { %>
+                    <p class="text-muted">You haven't added any friends yet.</p>
+                    <% } else { %>
+                    <ul class="list-group">
+                        <% friends.forEach(friend => { %>
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                            style="
+                                background-color: var(--tweet-bg);
+                                color: var(--text-color);
+                                border: 1px solid var(--border-color);
+                            "
+                        >
+                            <div>
+                                <strong><%= friend.full_name %></strong>
+                                <span class="text-light"
+                                    >@<%= friend.username %></span
+                                >
+                            </div>
+                            <a
+                                href="/profile/<%= friend.uid %>"
+                                class="btn btn-sm btn-primary"
+                                >View Profile</a
+                            >
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } %>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="col-2 right-col"></div>
+            </div>
+        </div>
+
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/420dd176dc.js"
+            crossorigin="anonymous"
+        ></script>
+        <script src="/scripts/themeChange.js"></script>
+    </body>
+</html>
