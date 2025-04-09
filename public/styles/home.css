@@ -1,0 +1,105 @@
+:root {
+    --black: #121212;
+    --white: #f1f1f1;
+    --pure-black: #000000;
+    --pure-white: #ffffff;
+
+    --bg-color: var(--black);
+    --text-color: var(--white);
+    --tweet-bg: #1a1a1a;
+    --tweet-hover: #1e1e1e;
+    --border-color: #2c2c2c;
+    --timestamp-color: #aaa;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.container-fluid {
+    max-width: 1300px;
+    margin: auto;
+}
+
+.left-col,
+.right-col {
+    padding: 2rem;
+}
+
+.left-col {
+    border-right: 1px solid var(--border-color);
+}
+
+.right-col {
+    border-left: 1px solid var(--border-color);
+}
+
+.middle-col {
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    padding: 2rem;
+}
+
+.tweet {
+    padding: 1rem;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    background-color: var(--tweet-bg);
+}
+
+.tweet:hover {
+    background-color: var(--tweet-hover);
+}
+
+.tweet-author {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.tweet-time {
+    color: var(--timestamp-color);
+    font-size: 0.9rem;
+}
+
+.info i {
+    margin-right: 0.3rem;
+}
+
+.info span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-color);
+}
+
+.post-box {
+    background-color: var(--tweet-bg);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.post-box textarea {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    resize: none;
+    width: 100%;
+}
+
+.post-box textarea:focus {
+    outline: none;
+}
+
+.fa-heart {
+    color: red;
+}
+
+.fa-eye {
+    color: limegreen;
+}
+
+.fa-share-nodes {
+    color: dodgerblue;
+}
