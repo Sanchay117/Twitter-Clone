@@ -142,6 +142,9 @@ app.get('/post/:id', async (req, res) => {
         return res.redirect('/');
     }
 
+    const currentUserId = req.session.user.uid;
+    const postOwnerId = req.params.id;
+
     const postId = req.params.id;
 
     let { data, error } = await supabase
@@ -182,10 +185,89 @@ app.get('/post/:id', async (req, res) => {
         el.date = formatTimeAgo(el.date).timeAgo;
     });
 
-    // console.log(data);
-    // console.log(data2);
+    const post = data;
 
-    res.render('post', { post: data, timeAgo: date.timeAgo, comments: data2 }); // assuming you're using EJS/Pug/etc.
+    // Check if friends
+    const { data: friendData } = await supabase
+        .from('friends')
+        .select('*')
+        .or(`uid1.eq.${currentUserId},uid2.eq.${currentUserId}`)
+        .eq('uid1', postOwnerId)
+        .eq('uid2', currentUserId);
+
+    const isFriend = friendData && friendData.length > 0;
+
+    // Check if already following
+    const { data: followData } = await supabase
+        .from('follows')
+        .select('*')
+        .eq('uid', currentUserId)
+        .eq('target', postOwnerId);
+
+    const isFollowing = followData && followData.length > 0;
+    res.render('post', {
+        post,
+        timeAgo: date.timeAgo,
+        comments: data2,
+        session: { user: req.session.user },
+        isFriend,
+        isFollowing,
+    });
+});
+
+app.post('/add-friend/:id', async (req, res) => {
+    const currentUserId = req.session.user.uid;
+    const targetId = req.params.id;
+
+    // Ensure the user is not already a friend
+    const { data: existing, error } = await supabase
+        .from('friends')
+        .select('*')
+        .eq('uid1', currentUserId)
+        .eq('uid2', targetId);
+
+    if (!error && existing.length === 0) {
+        await supabase.from('friends').insert([
+            { uid1: currentUserId, uid2: targetId },
+            { uid1: targetId, uid2: currentUserId },
+        ]);
+    }
+
+    res.redirect('back');
+});
+
+app.post('/follow/:id', async (req, res) => {
+    const currentUserId = req.session.user.uid;
+    const targetId = req.params.id;
+
+    if (currentUserId === targetId) return res.redirect('back');
+
+    const { data: alreadyFollowing } = await supabase
+        .from('follows')
+        .select('*')
+        .eq('uid', currentUserId)
+        .eq('target', targetId);
+
+    if (!alreadyFollowing || alreadyFollowing.length === 0) {
+        await supabase
+            .from('follows')
+            .insert([{ uid: currentUserId, target: targetId }]);
+    }
+
+    res.redirect('back');
+});
+
+app.post('/unfollow/:id', async (req, res) => {
+    const currentUserId = req.session.user.uid;
+    const targetId = req.params.id;
+
+    await supabase
+        .from('follows')
+        .delete()
+        .eq('uid', currentUserId)
+        .eq('target', targetId);
+
+    res.redirect('back');
 });
 
 app.post('/post/:id', async (req, res) => {

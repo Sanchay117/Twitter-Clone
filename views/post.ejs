@@ -69,7 +69,64 @@
                         </div>
                     </div>
 
-                    <!-- Comments Section -->
+                    <!-- Action Buttons -->
+                    <div class="d-flex align-items-center flex-wrap gap-2 my-4">
+                        <!-- Like Button -->
+                        <form action="/like/<%= post.pid %>" method="POST">
+                            <button
+                                class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                            >
+                                <i class="fa-solid fa-heart me-1"></i>
+                                <%= post.likes %> Likes
+                            </button>
+                        </form>
+
+                        <% if (post.uid !== session.user.uid) { %>
+
+                        <!-- Add Friend -->
+                        <% if (!isFriend) { %>
+                        <form
+                            action="/add-friend/<%= post.uid %>"
+                            method="POST"
+                        >
+                            <button
+                                class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                            >
+                                <i class="fa-solid fa-user-plus me-1"></i> Add
+                                Friend
+                            </button>
+                        </form>
+                        <% } else { %>
+                        <span
+                            class="badge bg-success d-flex align-items-center"
+                        >
+                            <i class="fa-solid fa-user-check me-1"></i> Friends
+                        </span>
+                        <% } %>
+
+                        <!-- Follow/Unfollow -->
+                        <% if (!isFollowing) { %>
+                        <form action="/follow/<%= post.uid %>" method="POST">
+                            <button
+                                class="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                            >
+                                <i class="fa-solid fa-user-plus me-1"></i>
+                                Follow
+                            </button>
+                        </form>
+                        <% } else { %>
+                        <form action="/unfollow/<%= post.uid %>" method="POST">
+                            <button
+                                class="btn btn-sm btn-outline-dark d-flex align-items-center"
+                            >
+                                <i class="fa-solid fa-user-minus me-1"></i>
+                                Unfollow
+                            </button>
+                        </form>
+                        <% } %> <% } %>
+                    </div>
+
+                    <!-- Comment Box -->
                     <div class="post-box mt-4">
                         <form action="/post/<%= post.pid %>" method="post">
                             <div class="mb-3">
@@ -103,6 +160,7 @@
                         </form>
                     </div>
 
+                    <!-- Comments List -->
                     <% if (comments && comments.length > 0) { %>
                     <h5 class="mt-5 mb-3"><%= comments.length %> Comments</h5>
                     <% comments.forEach(comment => { %>
