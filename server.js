@@ -503,6 +503,58 @@ app.post('/chat/:uid', async (req, res) => {
     res.redirect(`/chat/${otherUID}`);
 });
 
+app.get('/notifications', async (req, res) => {
+    if (!req.session.user) return res.redirect('/');
+
+    const userId = req.session.user.ID;
+    if (!userId) return res.redirect('/');
+
+    const { data: notifData, error: notifError } = await supabase
+        .from('notification')
+        .select('nid, uid, sid, type, pid, content, isread, created_at')
+        .eq('uid', userId)
+        .order('created_at', { ascending: false });
+
+    if (notifError) {
+        console.error('Error fetching notifications:', notifError.message);
+        return res.status(500).send('Could not load notifications');
+    }
+
+    // console.log(notifData);
+    // Fetch sender names in one query
+    const senderIds = [...new Set(notifData.map((n) => n.sid))];
+    // console.log(senderIds);
+    const { data: sendersData, error: sendersError } = await supabase
+        .from('users')
+        .select('uid, username')
+        .in('uid', senderIds);
+
+    if (sendersError) {
+        console.error('Error fetching senders:', sendersError.message);
+        return res.status(500).send('Could not load senders');
+    }
+
+    const senderMap = {};
+    sendersData.forEach((u) => {
+        senderMap[u.uid] = u.username;
+    });
+
+    // Attach sender username
+    const enrichedNotifs = notifData.map((n) => ({
+        nid: n.nid,
+        uid: n.uid,
+        sid: n.sid,
+        sender_name: senderMap[n.sid] || 'Unknown',
+        type: n.type,
+        pid: n.pid,
+        content: n.content,
+        isread: n.isread,
+        created_at: n.created_at,
+    }));
+
+    res.render('notifications', { notifications: enrichedNotifs });
+});
+
 // API endpoints
 app.get('/api/user', (req, res) => {
     if (!req.session.user) {

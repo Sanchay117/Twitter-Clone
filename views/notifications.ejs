@@ -2,8 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Friends</title>
+        <title>Notifications</title>
         <link
             rel="stylesheet"
             href="/bootstrap-5.3.3-dist/css/bootstrap.min.css"
@@ -13,7 +12,7 @@
     <body>
         <div class="container-fluid">
             <div class="row">
-                <!-- Left Sidebar -->
+                <!-- Sidebar -->
                 <div class="col-2 left-col">
                     <h4 class="mb-4">
                         <i class="fa-brands fa-twitter"></i> Twit
@@ -28,9 +27,7 @@
                             >
                         </li>
                         <li class="nav-item mb-2">
-                            <a
-                                href="/friends"
-                                class="nav-link text-light active"
+                            <a href="/friends" class="nav-link text-light"
                                 >Friends</a
                             >
                         </li>
@@ -40,7 +37,9 @@
                             >
                         </li>
                         <li class="nav-item mb-2">
-                            <a href="/notifications" class="nav-link text-light"
+                            <a
+                                href="/notifications"
+                                class="nav-link text-light active"
                                 >Notifications</a
                             >
                         </li>
@@ -55,14 +54,14 @@
                     </button>
                 </div>
 
-                <!-- Friends List -->
+                <!-- Notifications -->
                 <div class="col-8 middle-col">
-                    <h3 class="mb-4">Your Friends</h3>
-                    <% if (friends.length === 0) { %>
-                    <p class="text-light">You haven't added any friends yet.</p>
+                    <h3 class="mb-4">Notifications</h3>
+                    <% if (notifications.length === 0) { %>
+                    <p class="text-light">You have no notifications.</p>
                     <% } else { %>
                     <ul class="list-group">
-                        <% friends.forEach(friend => { %>
+                        <% notifications.forEach(n => { %>
                         <li
                             class="list-group-item d-flex justify-content-between align-items-center"
                             style="
@@ -72,32 +71,35 @@
                             "
                         >
                             <div>
-                                <strong><%= friend.full_name %></strong>
-                                <span class="text-light"
-                                    >@<%= friend.username %></span
+                                <strong><%= n.sender_name %></strong>
+                                <% if (n.type === 'follow') { %> started
+                                following you. <% } else if (n.type ===
+                                'comment') { %> commented on your
+                                <a href="/post/<%= n.pid %>">post</a>: "<%=
+                                n.content %>" <% } else if (n.type ===
+                                'message') { %> sent you a message: "<%=
+                                n.content %>" <% } else { %> <%= n.content %> <%
+                                } %>
+                                <br />
+                                <small class="text-light"
+                                    ><%= new Date(n.created_at).toLocaleString()
+                                    %></small
                                 >
                             </div>
-                            <a
-                                href="/profile/<%= friend.uid %>"
-                                class="btn btn-sm btn-primary"
-                                >View Profile</a
-                            >
+                            <% if (!n.isread) { %>
+                            <span class="badge bg-danger">New</span>
+                            <% } %>
                         </li>
                         <% }) %>
                     </ul>
                     <% } %>
                 </div>
 
-                <!-- Right Sidebar -->
                 <div class="col-2 right-col"></div>
             </div>
         </div>
 
         <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
-        <script
-            src="https://kit.fontawesome.com/420dd176dc.js"
-            crossorigin="anonymous"
-        ></script>
         <script src="/scripts/themeChange.js"></script>
     </body>
 </html>

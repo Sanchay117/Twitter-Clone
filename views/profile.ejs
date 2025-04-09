@@ -38,6 +38,11 @@
                             >
                         </li>
                         <li class="nav-item mb-2">
+                            <a href="/notifications" class="nav-link text-light"
+                                >Notifications</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
                             <a href="/settings" class="nav-link text-light"
                                 >Settings</a
                             >
@@ -95,7 +100,7 @@
                     <div class="mb-4">
                         <h5>Mutual Friends</h5>
                         <% if (mutualFriends.length === 0) { %>
-                        <p class="text-muted">No mutual friends</p>
+                        <p class="text-light">No mutual friends</p>
                         <% } else { %>
                         <ul class="list-group">
                             <% mutualFriends.forEach(f => { %>
@@ -118,7 +123,7 @@
                     <div>
                         <h5>Recent Posts</h5>
                         <% if (recentPosts.length === 0) { %>
-                        <p class="text-muted">No posts yet.</p>
+                        <p class="text-light">No posts yet.</p>
                         <% } else { %> <% recentPosts.forEach(post => { %>
                         <div
                             class="card mb-2"
@@ -129,7 +134,7 @@
                         >
                             <div class="card-body">
                                 <p><%= post.content %></p>
-                                <small class="text-muted"
+                                <small class="text-light"
                                     ><%= new
                                     Date(post.created_at).toLocaleString()
                                     %></small
