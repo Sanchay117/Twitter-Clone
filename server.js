@@ -257,7 +257,7 @@ app.get('/friends', async (req, res) => {
         return res.status(500).send('Error loading friends info');
     }
 
-    console.log(friendUsers);
+    // console.log(friendUsers);
     res.render('friends', { friends: friendUsers });
 });
 
@@ -324,14 +324,75 @@ app.get('/messages', async (req, res) => {
     res.render('messages', { messages: conversations });
 });
 
-// Logout route
-app.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).send('Error logging out');
-        }
-        res.redirect('/login');
+app.get('/chat/:uid', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    const currentUID = req.session.user.ID;
+    if (!currentUID) return res.redirect('/login');
+    const otherUID = req.params.uid;
+
+    // Fetch user info of the other person
+    const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('uid, username, bio')
+        .eq('uid', otherUID)
+        .single();
+
+    if (userError || !userData) {
+        console.error(userError?.message);
+        return res.status(404).send('User not found');
+    }
+
+    // Fetch messages between currentUID and otherUID
+    const { data: messages, error: msgError } = await supabase
+        .from('messages')
+        .select('*')
+        .or(
+            `and(uid1.eq.${currentUID},uid2.eq.${otherUID}),and(uid1.eq.${otherUID},uid2.eq.${currentUID})`
+        )
+        .order('date', { ascending: true });
+
+    if (msgError) {
+        console.error(msgError.message);
+        return res.status(500).send('Error fetching messages');
+    }
+
+    res.render('chat', {
+        messages,
+        currentUID,
+        otherUser: userData,
     });
+});
+
+app.post('/chat/:uid', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    const currentUID = req.session.user.ID;
+    if (!currentUID) return res.redirect('/');
+
+    const otherUID = req.params.uid;
+    const { content } = req.body;
+
+    if (!content || content.trim() === '')
+        return res.redirect(`/chat/${otherUID}`);
+
+    const { error } = await supabase.from('messages').insert([
+        {
+            uid1: currentUID,
+            uid2: otherUID,
+            content: content,
+            date: new Date().toISOString(),
+        },
+    ]);
+
+    if (error) {
+        console.error('Error sending message:', error.message);
+        return res.status(500).send('Error sending message');
+    }
+
+    res.redirect(`/chat/${otherUID}`);
 });
 
 // API endpoints
