@@ -108,8 +108,7 @@ app.post('/signup', async (req, res) => {
         return res.status(500).send('Error inserting user.');
     }
 
-    req.session.user = { username };
-    res.redirect('/home');
+    res.redirect('/login');
 });
 
 app.post('/create', async (req, res) => {
@@ -138,14 +137,11 @@ app.post('/create', async (req, res) => {
     res.redirect('/home');
 });
 
-app.get('/create', (req, res) => {
+app.get('/post/:id', async (req, res) => {
     if (!req.session.user) {
         return res.redirect('/');
     }
-    res.sendFile(__dirname + '/public/createPost.html');
-});
 
-app.get('/post/:id', async (req, res) => {
     const postId = req.params.id;
 
     let { data, error } = await supabase
@@ -186,7 +182,40 @@ app.get('/post/:id', async (req, res) => {
         el.date = formatTimeAgo(el.date).timeAgo;
     });
 
+    // console.log(data);
+    // console.log(data2);
+
     res.render('post', { post: data, timeAgo: date.timeAgo, comments: data2 }); // assuming you're using EJS/Pug/etc.
+});
+
+app.post('/post/:id', async (req, res) => {
+    const { comment } = req.body;
+    const postId = req.params.id;
+    const userId = req.session.user.ID; // Assuming you're storing user info in session
+
+    if (!userId) {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const { data, error } = await supabase.from('comments').insert([
+            {
+                pid: postId,
+                uid: userId,
+                content: comment,
+            },
+        ]);
+
+        if (error) {
+            console.error(error);
+            return res.status(500).send('Error adding comment');
+        }
+
+        res.redirect(`/post/${postId}`); // Redirect back to the post page
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
 });
 
 // Logout route
