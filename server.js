@@ -112,6 +112,39 @@ app.post('/signup', async (req, res) => {
     res.redirect('/home');
 });
 
+app.post('/create', async (req, res) => {
+    const uID = req.session.user.ID;
+    const { tweet } = req.body;
+
+    if (!tweet || tweet.length > 250) {
+        return res
+            .status(400)
+            .json({ error: 'Tweet must be 250 characters or less' });
+    }
+
+    const { error } = await supabase.from('posts').insert([
+        {
+            uid: uID,
+            content: tweet,
+            views: 1,
+        },
+    ]);
+
+    if (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Failed to create post' });
+    }
+
+    res.redirect('/home');
+});
+
+app.get('/create', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    res.sendFile(__dirname + '/public/createPost.html');
+});
+
 app.get('/post/:id', async (req, res) => {
     const postId = req.params.id;
 
@@ -166,6 +199,7 @@ app.post('/logout', (req, res) => {
     });
 });
 
+// API endpoints
 app.get('/api/user', (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Not logged in' });
@@ -191,39 +225,6 @@ app.get('/api/posts', async (req, res) => {
     } else {
         res.json({ data: data });
     }
-});
-
-app.post('/create', async (req, res) => {
-    const uID = req.session.user.ID;
-    const { tweet } = req.body;
-
-    if (!tweet || tweet.length > 250) {
-        return res
-            .status(400)
-            .json({ error: 'Tweet must be 250 characters or less' });
-    }
-
-    const { error } = await supabase.from('posts').insert([
-        {
-            uid: uID,
-            content: tweet,
-            views: 1,
-        },
-    ]);
-
-    if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Failed to create post' });
-    }
-
-    res.redirect('/home');
-});
-
-app.get('/create', (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/');
-    }
-    res.sendFile(__dirname + '/public/createPost.html');
 });
 
 app.listen(PORT, () => {

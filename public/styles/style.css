@@ -1,15 +1,18 @@
-:root{
-    --white:#ecf0f1;
-    --black:#2c3e50;
-    --blue:#3498db;
-    --dark-blue:#2980b9;
-    --dark-black:#2f3542;
-    --dark-white:#f1f2f6;
+:root {
+    --white: #ecf0f1;
+    --black: #2c3e50;
+    --blue: #3498db;
+    --dark-blue: #2980b9;
+    --dark-black: #2f3542;
+    --dark-white: #f1f2f6;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--dark-white);
 }
 
 body {
@@ -17,23 +20,71 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    padding: 2rem;
 }
 
-body h1{
+h1 {
     color: var(--blue);
+    margin-bottom: 2rem;
+    font-weight: 700;
+    font-size: 2.5rem;
 }
 
-body h1 i{
-    color: black;
+h1 i {
+    color: var(--black);
+    margin-right: 0.5rem;
+}
+
+#login {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+#login h3 {
+    font-weight: 600;
+    color: var(--dark-black);
 }
 
 #login form {
-    padding: 2rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
-#login p{
+.form-floating label {
+    color: #999;
+}
+
+.form-control:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-primary {
+    background-color: var(--blue);
+    border-color: var(--dark-blue);
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-blue);
+}
+
+#login .form-check-label {
+    color: var(--black);
+}
+
+#login .link-primary {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#login .link-primary:hover {
+    text-decoration: underline;
+}
+
+#login p {
     margin-bottom: 0;
 }

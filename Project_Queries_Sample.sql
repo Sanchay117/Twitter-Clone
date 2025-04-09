@@ -1,6 +1,6 @@
 -- Queries
 
--- Get all posts along with user information (Join)
+-- Get all posts along with user information (Join) -> .get('/api/posts')
 SELECT p.PID, p.Content, p.Date, u.Username, u.Email 
 FROM Posts p 
 JOIN Users u ON p.UID = u.UID;
