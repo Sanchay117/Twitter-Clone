@@ -261,6 +261,69 @@ app.get('/friends', async (req, res) => {
     res.render('friends', { friends: friendUsers });
 });
 
+// GET /messages
+app.get('/messages', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/');
+    }
+    const currentUID = req.session.user.ID;
+    if (!currentUID) return res.redirect('/login');
+
+    // Step 1: Get all messages involving current user
+    const { data: messages, error: msgError } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`uid1.eq.${currentUID},uid2.eq.${currentUID}`);
+
+    if (msgError) {
+        console.error('Error fetching messages:', msgError.message);
+        return res.status(500).send('Internal Server Error');
+    }
+
+    // Step 2: Extract unique conversation partner UIDs
+    const otherUIDs = new Set();
+    messages.forEach((msg) => {
+        const other = msg.uid1 === currentUID ? msg.uid2 : msg.uid1;
+        otherUIDs.add(other);
+    });
+
+    // if (otherUIDs.size === 0) return res.render('messages', { conversations: [] });
+
+    // Step 3: Fetch user details for conversation partners
+    const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('uid, username, bio')
+        .in('uid', [...otherUIDs]);
+
+    if (userError) {
+        console.error('Error fetching users:', userError.message);
+        return res.status(500).send('Internal Server Error');
+    }
+
+    // Step 4: Get latest message for each conversation
+    const latestMessages = {};
+    messages.forEach((msg) => {
+        const other = msg.uid1 === currentUID ? msg.uid2 : msg.uid1;
+        if (
+            !latestMessages[other] ||
+            new Date(msg.Date) > new Date(latestMessages[other].Date)
+        ) {
+            latestMessages[other] = msg;
+        }
+    });
+
+    const conversations = users.map((user) => ({
+        uid: user.uid,
+        username: user.username,
+        full_name: user.bio,
+        latest_message: latestMessages[user.uid]?.content || '',
+    }));
+
+    // console.log(conversations);
+
+    res.render('messages', { messages: conversations });
+});
+
 // Logout route
 app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
