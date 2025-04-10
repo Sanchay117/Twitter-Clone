@@ -142,11 +142,10 @@ app.get('/post/:id', async (req, res) => {
         return res.redirect('/');
     }
 
-    const currentUserId = req.session.user.uid;
-    const postOwnerId = req.params.id;
-
     const postId = req.params.id;
+    const uid = req.session.user.ID;
 
+    // selecting post
     let { data, error } = await supabase
         .from('posts')
         .select(
@@ -159,6 +158,7 @@ app.get('/post/:id', async (req, res) => {
         )
         .eq('pid', postId);
 
+    // comments
     const { data: data2, error: error2 } = await supabase
         .from('comments')
         .select(
@@ -185,89 +185,204 @@ app.get('/post/:id', async (req, res) => {
         el.date = formatTimeAgo(el.date).timeAgo;
     });
 
-    const post = data;
+    // console.log(data, postId);
+    // console.log(data2);
 
-    // Check if friends
-    const { data: friendData } = await supabase
+    //incrementing views by 1
+    const { updateError } = await supabase
+        .from('posts')
+        .update({ views: 1 + data.views })
+        .eq('pid', postId);
+
+    if (updateError) {
+        console.error('Supabase update error:', updateError);
+        return res
+            .status(500)
+            .send({ message: 'Update failed', error: updateError });
+    }
+
+    // console.log(data);
+
+    // post already liked or nah
+    const { data: likeData, error: likeERR } = await supabase
+        .from('likes')
+        .select('*')
+        .eq('uid', uid)
+        .eq('pid', postId);
+    if (likeERR) {
+        console.error('Supabase Like error:', likeERR);
+        return res
+            .status(500)
+            .send({ message: 'Like check failed', error: likeERR });
+    }
+
+    let likedByCurrentUser = false;
+    if (likeData.length > 0) likedByCurrentUser = true;
+
+    // friend already liked or nah
+    const { data: friendData, error: friendERR } = await supabase
         .from('friends')
         .select('*')
-        .or(`uid1.eq.${currentUserId},uid2.eq.${currentUserId}`)
-        .eq('uid1', postOwnerId)
-        .eq('uid2', currentUserId);
+        .or(
+            `and(uid1.eq.${uid},uid2.eq.${data.uid}),and(uid1.eq.${data.uid},uid2.eq.${uid})`
+        );
 
-    const isFriend = friendData && friendData.length > 0;
+    if (friendERR) {
+        console.error('Supabase friend error:', friendERR);
+        return res
+            .status(500)
+            .send({ message: 'friend check failed', error: friendERR });
+    }
 
-    // Check if already following
-    const { data: followData } = await supabase
+    let isFriend = false;
+    if (friendData.length > 0) isFriend = true;
+
+    // following already liked or nah
+    const { data: followData, error: followERR } = await supabase
         .from('follows')
         .select('*')
-        .eq('uid', currentUserId)
-        .eq('target', postOwnerId);
+        .or(
+            `and(uid1.eq.${uid},uid2.eq.${data.uid}),and(uid1.eq.${data.uid},uid2.eq.${uid})`
+        );
 
-    const isFollowing = followData && followData.length > 0;
+    if (followERR) {
+        console.error('Supabase follow error:', followERR);
+        return res
+            .status(500)
+            .send({ message: 'follow check failed', error: followERR });
+    }
+
+    let isFollowing = false;
+    if (followData.length > 0) isFollowing = true;
+
+    // reported already liked or nah
+    const { data: reportData, error: reportERR } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('uid', req.session.user.ID)
+        .eq('pid', postId);
+
+    if (reportERR) {
+        console.error('Supabase report error:', reportERR);
+        return res
+            .status(500)
+            .send({ message: 'follow report failed', error: reportERR });
+    }
+
+    let isReported = false;
+    if (reportData.length > 0) isReported = true;
+
     res.render('post', {
-        post,
+        post: data,
         timeAgo: date.timeAgo,
         comments: data2,
-        session: { user: req.session.user },
+        likedByCurrentUser,
         isFriend,
         isFollowing,
-    });
+        isReported,
+        uid: req.session.user.ID,
+    }); // assuming you're using EJS/Pug/etc.
 });
 
-app.post('/add-friend/:id', async (req, res) => {
-    const currentUserId = req.session.user.uid;
-    const targetId = req.params.id;
+app.post('/like/:pid', async (req, res) => {
+    if (!req.session.user || !req.session.user.ID) {
+        return res.redirect('/');
+    }
 
-    // Ensure the user is not already a friend
-    const { data: existing, error } = await supabase
+    const pid = req.params.pid;
+    const uid = req.session.user.ID;
+
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('pid', pid);
+    if (error || !data) {
+        return res.status(404).send('Post not found');
+    }
+
+    const { updateError } = await supabase
+        .from('posts')
+        .update({ likes: 1 + data[0].likes })
+        .eq('pid', pid);
+
+    if (updateError) {
+        console.error('Supabase update error:', updateError);
+        return res
+            .status(500)
+            .send({ message: 'Update failed', error: updateError });
+    }
+
+    const { likeError } = await supabase.from('likes').insert({ uid, pid });
+
+    if (likeError) {
+        console.error('Supabase Like error:', updateError);
+        return res
+            .status(500)
+            .send({ message: 'Like failed', error: updateError });
+    }
+
+    return res.redirect(`/post/${pid}`);
+});
+
+app.post('/add-friend/:pid', async (req, res) => {
+    if (!req.session.user || !req.session.user.ID) {
+        return res.redirect('/');
+    }
+
+    const pid = req.params.pid;
+    const uid = req.session.user.ID;
+
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('pid', pid);
+    if (error || !data) {
+        return res.status(404).send('Post not found');
+    }
+
+    const { friendError } = await supabase
         .from('friends')
-        .select('*')
-        .eq('uid1', currentUserId)
-        .eq('uid2', targetId);
+        .insert({ uid1: uid, uid2: data[0].uid });
 
-    if (!error && existing.length === 0) {
-        await supabase.from('friends').insert([
-            { uid1: currentUserId, uid2: targetId },
-            { uid1: targetId, uid2: currentUserId },
-        ]);
+    if (friendError) {
+        console.error('Supabase Friend error:', friendError);
+        return res
+            .status(500)
+            .send({ message: 'Friend failed', error: friendError });
     }
 
-    res.redirect('back');
+    return res.redirect(`/post/${pid}`);
 });
 
-app.post('/follow/:id', async (req, res) => {
-    const currentUserId = req.session.user.uid;
-    const targetId = req.params.id;
-
-    if (currentUserId === targetId) return res.redirect('back');
-
-    const { data: alreadyFollowing } = await supabase
-        .from('follows')
-        .select('*')
-        .eq('uid', currentUserId)
-        .eq('target', targetId);
-
-    if (!alreadyFollowing || alreadyFollowing.length === 0) {
-        await supabase
-            .from('follows')
-            .insert([{ uid: currentUserId, target: targetId }]);
+app.post('/report/:pid', async (req, res) => {
+    if (!req.session.user || !req.session.user.ID) {
+        return res.redirect('/');
     }
 
-    res.redirect('back');
-});
+    const pid = req.params.pid;
+    const uid = req.session.user.ID;
+    const reason = req.body.reason;
 
-app.post('/unfollow/:id', async (req, res) => {
-    const currentUserId = req.session.user.uid;
-    const targetId = req.params.id;
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('pid', pid);
+    if (error || !data) {
+        return res.status(404).send('Post not found');
+    }
 
-    await supabase
-        .from('follows')
-        .delete()
-        .eq('uid', currentUserId)
-        .eq('target', targetId);
+    const { reportError } = await supabase
+        .from('reports')
+        .insert({ uid, pid, reason });
 
-    res.redirect('back');
+    if (reportError) {
+        console.error('Supabase Report error:', reportError);
+        return res
+            .status(500)
+            .send({ message: 'report failed', error: reportError });
+    }
+
+    return res.redirect(`/post/${pid}`);
 });
 
 app.post('/post/:id', async (req, res) => {

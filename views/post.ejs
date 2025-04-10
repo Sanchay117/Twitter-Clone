@@ -72,16 +72,26 @@
                     <!-- Action Buttons -->
                     <div class="d-flex align-items-center flex-wrap gap-2 my-4">
                         <!-- Like Button -->
+                        <% if (post.likedByCurrentUser) { %>
+                        <div
+                            class="btn btn-sm d-flex align-items-center rounded-pill px-3 btn-danger"
+                            style="pointer-events: none; font-weight: 600"
+                        >
+                            <i class="fa-solid fa-heart me-2"></i>
+                            <%= post.likes %> Likes
+                        </div>
+                        <% } else { %>
                         <form action="/like/<%= post.pid %>" method="POST">
                             <button
-                                class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                                class="btn btn-sm d-flex align-items-center rounded-pill px-3 btn-outline-danger"
                             >
-                                <i class="fa-solid fa-heart me-1"></i>
+                                <i
+                                    class="fa-solid fa-heart me-2 text-danger"
+                                ></i>
                                 <%= post.likes %> Likes
                             </button>
                         </form>
-
-                        <% if (post.uid !== session.user.uid) { %>
+                        <% } %> <% if (post.pid !== uid) { %>
 
                         <!-- Add Friend -->
                         <% if (!isFriend) { %>
@@ -90,40 +100,79 @@
                             method="POST"
                         >
                             <button
-                                class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                class="btn btn-sm btn-outline-primary d-flex align-items-center rounded-pill px-3"
                             >
-                                <i class="fa-solid fa-user-plus me-1"></i> Add
+                                <i class="fa-solid fa-user-plus me-2"></i> Add
                                 Friend
                             </button>
                         </form>
                         <% } else { %>
                         <span
-                            class="badge bg-success d-flex align-items-center"
+                            class="badge bg-success d-flex align-items-center rounded-pill px-3"
                         >
-                            <i class="fa-solid fa-user-check me-1"></i> Friends
+                            <i class="fa-solid fa-user-check me-2"></i> Friends
                         </span>
-                        <% } %>
+                        <% } %> <% } %>
 
-                        <!-- Follow/Unfollow -->
+                        <!-- Follow / Unfollow -->
                         <% if (!isFollowing) { %>
                         <form action="/follow/<%= post.uid %>" method="POST">
                             <button
-                                class="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                                class="btn btn-sm btn-outline-secondary d-flex align-items-center rounded-pill px-3"
                             >
-                                <i class="fa-solid fa-user-plus me-1"></i>
+                                <i class="fa-solid fa-user-plus me-2"></i>
                                 Follow
                             </button>
                         </form>
                         <% } else { %>
-                        <form action="/unfollow/<%= post.uid %>" method="POST">
+                        <div
+                            class="btn btn-sm d-flex align-items-center rounded-pill px-3 btn-dark"
+                            style="pointer-events: none; font-weight: 600"
+                        >
+                            <i
+                                class="fa-solid fa-user-check me-2 text-white"
+                            ></i>
+                            Followed
+                        </div>
+
+                        <% } %>
+
+                        <!-- Report Button -->
+                        <% if (isReported) { %>
+                        <div
+                            class="btn btn-sm d-flex align-items-center rounded-pill px-3 btn-warning"
+                            style="
+                                pointer-events: none;
+                                font-weight: 600;
+                                opacity: 0.75;
+                            "
+                        >
+                            <i class="fa-solid fa-flag me-2 text-white"></i>
+                            Reported
+                        </div>
+                        <% } else { %>
+                        <form
+                            action="/report/<%= post.pid %>"
+                            method="POST"
+                            onsubmit="return confirm('Are you sure you want to report this post?');"
+                            class="d-flex flex-column gap-2"
+                        >
+                            <textarea
+                                name="reason"
+                                class="form-control form-control-sm"
+                                rows="2"
+                                placeholder="Reason for reporting..."
+                                required
+                            ></textarea>
                             <button
-                                class="btn btn-sm btn-outline-dark d-flex align-items-center"
+                                class="btn btn-sm btn-outline-warning d-flex align-items-center rounded-pill px-3"
                             >
-                                <i class="fa-solid fa-user-minus me-1"></i>
-                                Unfollow
+                                <i class="fa-solid fa-flag me-2"></i>
+                                Report
                             </button>
                         </form>
-                        <% } %> <% } %>
+
+                        <% } %>
                     </div>
 
                     <!-- Comment Box -->
