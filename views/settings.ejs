@@ -101,32 +101,8 @@
                                 <strong>Date of Birth:</strong> <%= profile.dob
                                 %>
                             </p>
-
-                            <div class="d-flex gap-2 mt-3">
-                                <form
-                                    method="POST"
-                                    action="/follow/<%= profile.uid %>"
-                                >
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm <%= isFollowing ? 'btn-danger' : 'btn-success' %>"
-                                    >
-                                        <%= isFollowing ? 'Unfollow' : 'Follow'
-                                        %>
-                                    </button>
-                                </form>
-                                <a
-                                    href="/chat/<%= profile.uid %>"
-                                    class="btn btn-sm btn-primary"
-                                    >Send Message</a
-                                >
-                            </div>
                         </div>
                     </div>
-
-                    <!-- Mutual Friends -->
-
-                    <!-- Recent Posts -->
                 </div>
 
                 <!-- Right Sidebar -->

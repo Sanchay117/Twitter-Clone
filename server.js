@@ -842,9 +842,42 @@ app.get('/notifications', async (req, res) => {
 
 // settings
 app.get('/settings', async (req, res) => {
-    if (!req.session.user || req.session.user.ID) {
+    if (!req.session.user || !req.session.user.ID) {
         return res.redirect('/login');
     }
+
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', req.session.user.ID);
+
+    if (!data || error) {
+        console.error(error);
+        res.status(404).send('Error fetching user');
+    }
+
+    // console.log(data[0]);
+
+    res.render('settings', {
+        profile: data[0],
+    });
+});
+
+app.post('/update-bio/:uid', async (req, res) => {
+    const uid = req.params.uid;
+    const bio = req.body.bio;
+
+    const { error } = await supabase
+        .from('users')
+        .update({ bio })
+        .eq('uid', uid);
+
+    if (error) {
+        console.error(error);
+        return res.status(404).send('Error updating bio');
+    }
+
+    res.redirect(`/settings`);
 });
 
 // API endpoints
