@@ -160,6 +160,77 @@ app.post('/create', async (req, res) => {
     res.redirect('/home');
 });
 
+// Ban a user
+app.post('/ban/:uid', async (req, res) => {
+    if (!req.session.admin || !req.session.admin.AID) {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const uid = req.params.uid;
+    const { reason } = req.body;
+    const aid = req.session.admin.AID;
+
+    if (!reason || reason.trim() === '') {
+        return res.status(400).send('Reason for banning is required.');
+    }
+
+    // Check if the user exists
+    const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', uid)
+        .single();
+
+    if (userError || !user) {
+        return res.status(404).send('User not found.');
+    }
+
+    // Insert into the Banned table
+    const { error: banError } = await supabase
+        .from('banned')
+        .insert([{ uid, aid, reason }]);
+
+    if (banError) {
+        console.error('Error banning user:', banError);
+        return res.status(500).send('Failed to ban user.');
+    }
+
+    res.send('User has been banned successfully.');
+});
+
+// Unban a user
+app.post('/unban/:uid', async (req, res) => {
+    if (!req.session.admin || !req.session.admin.AID) {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const uid = req.params.uid;
+
+    // Check if the user is banned
+    const { data: bannedUser, error: bannedError } = await supabase
+        .from('banned')
+        .select('*')
+        .eq('uid', uid)
+        .single();
+
+    if (bannedError || !bannedUser) {
+        return res.status(404).send('User is not banned.');
+    }
+
+    // Remove the user from the Banned table
+    const { error: unbanError } = await supabase
+        .from('banned')
+        .delete()
+        .eq('uid', uid);
+
+    if (unbanError) {
+        console.error('Error unbanning user:', unbanError);
+        return res.status(500).send('Failed to unban user.');
+    }
+
+    res.send('User has been unbanned successfully.');
+});
+
 app.get('/post/:id', async (req, res) => {
     if (!req.session.user) {
         return res.redirect('/');
