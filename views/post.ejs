@@ -98,18 +98,20 @@
                         </form>
                         <% } %>
                         <!-- Add Friend -->
-                        <% if (!isFriend) { %>
+                        <% if (post.uid !== uid) { %> <% if (!isFriend) { %>
                         <form
                             action="/add-friend/<%= post.uid %>"
                             method="POST"
                         >
                             <button
-                                class="btn btn-sm btn-outline-primary d-flex align-items-center rounded-pill px-3"
+                                class="btn btn-sm d-flex align-items-center rounded-pill px-3 btn-outline-primary"
+                                style="font-weight: 600; height: 38px"
                             >
-                                <i class="fa-solid fa-user-plus me-2"></i> Add
-                                Friend
+                                <i class="fa-solid fa-user-plus me-2"></i>
+                                Add Friend
                             </button>
                         </form>
+
                         <% } else { %>
                         <div
                             class="btn btn-sm d-flex align-items-center rounded-pill px-3 bg-success text-white"
@@ -117,7 +119,7 @@
                         >
                             <i class="fa-solid fa-user-check me-2"></i> Friends
                         </div>
-                        <% } %>
+                        <% } %> <% } %>
 
                         <!-- Report Button -->
                         <% if (isReported) { %>
