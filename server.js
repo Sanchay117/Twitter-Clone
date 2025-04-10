@@ -68,6 +68,22 @@ app.post('/login', async (req, res) => {
         return res.send('Invalid credentials');
     }
 
+    // Check if the user is banned
+    const { data: bannedUser, error: bannedError } = await supabase
+        .from('banned')
+        .select('*')
+        .eq('uid', data.uid)
+        .single();
+
+    if (bannedError) {
+        console.error('Error checking banned status:', bannedError);
+        return res.status(500).send('Internal server error');
+    }
+
+    if (bannedUser) {
+        return res.status(403).send(`You are banned. Reason: ${bannedUser.reason}`);
+    }
+
     const ID = data.uid;
     const bio = data.bio;
     req.session.user = { username, ID, bio }; // Store in session
