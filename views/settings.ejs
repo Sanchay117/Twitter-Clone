@@ -68,7 +68,35 @@
                                     >@<%= profile.username %></small
                                 >
                             </h3>
-                            <p><%= profile.bio %></p>
+
+                            <!-- Bio Section with Editable Option -->
+                            <form
+                                action="/update-bio/<%= profile.uid %>"
+                                method="POST"
+                                class="mb-3"
+                            >
+                                <div class="form-group">
+                                    <label for="bio" class="form-label"
+                                        >Bio</label
+                                    >
+                                    <textarea
+                                        id="bio"
+                                        name="bio"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="Write something about yourself"
+                                    >
+<%= profile.bio %></textarea
+                                    >
+                                </div>
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-outline-primary mt-2"
+                                >
+                                    Save Bio
+                                </button>
+                            </form>
+
                             <p>
                                 <strong>Date of Birth:</strong> <%= profile.dob
                                 %>
@@ -97,51 +125,8 @@
                     </div>
 
                     <!-- Mutual Friends -->
-                    <div class="mb-4">
-                        <h5>Mutual Friends</h5>
-                        <% if (mutualFriends.length === 0) { %>
-                        <p class="text-light">No mutual friends</p>
-                        <% } else { %>
-                        <ul class="list-group">
-                            <% mutualFriends.forEach(f => { %>
-                            <li
-                                class="list-group-item"
-                                style="
-                                    background-color: var(--tweet-bg);
-                                    color: var(--text-color);
-                                "
-                            >
-                                <strong><%= f.full_name %></strong> @<%=
-                                f.username %>
-                            </li>
-                            <% }) %>
-                        </ul>
-                        <% } %>
-                    </div>
 
                     <!-- Recent Posts -->
-                    <div>
-                        <h5>Recent Posts</h5>
-                        <% if (recentPosts.length === 0) { %>
-                        <p class="text-light">No posts yet.</p>
-                        <% } else { %> <% recentPosts.forEach(post => { %>
-                        <div
-                            class="card mb-2"
-                            style="
-                                background-color: var(--tweet-bg);
-                                color: var(--text-color);
-                            "
-                        >
-                            <div class="card-body">
-                                <p><%= post.content %></p>
-                                <small class="text-light"
-                                    ><%= new Date(post.date).toLocaleString()
-                                    %></small
-                                >
-                            </div>
-                        </div>
-                        <% }) %> <% } %>
-                    </div>
                 </div>
 
                 <!-- Right Sidebar -->
