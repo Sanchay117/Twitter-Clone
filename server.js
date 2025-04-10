@@ -116,7 +116,7 @@ app.post('/signup', async (req, res) => {
 app.post('/admin/login', async (req, res) => {
     const { password } = req.body;
 
-    if (!aid || !password) {
+    if (!password) {
         return res.status(400).send('Admin password required.');
     }
 
