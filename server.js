@@ -863,6 +863,88 @@ app.get('/settings', async (req, res) => {
     });
 });
 
+// profile
+app.get('/profile', async (req, res) => {
+    if (!req.session.user || !req.session.user.ID) {
+        return res.redirect('/login');
+    }
+
+    const currentUserId = req.session.user.ID; // current logged-in user's ID
+
+    // 1. Fetch user profile (the current logged-in user)
+    const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .select('uid, username, bio, dob')
+        .eq('uid', currentUserId)
+        .single();
+
+    if (profileError || !profile) {
+        console.error('Profile fetch error:', profileError?.message);
+        return res.status(404).send('User not found');
+    }
+
+    // 2. Fetch the list of users the current user is following
+    const { data: followingData, error: followingError } = await supabase
+        .from('follows')
+        .select('uid2') // Get the users the current user is following
+        .eq('uid1', currentUserId);
+
+    if (followingError) {
+        console.error('Error fetching following data:', followingError.message);
+        return res.status(500).send('Error fetching following data');
+    }
+
+    const followingIds = followingData.map((follow) => follow.uid2);
+
+    // 3. Fetch the list of followers for the current logged-in user
+    const { data: followersData, error: followersError } = await supabase
+        .from('follows')
+        .select('uid1') // Get the users who follow the current logged-in user
+        .eq('uid2', currentUserId);
+
+    if (followersError) {
+        console.error('Error fetching followers data:', followersError.message);
+        return res.status(500).send('Error fetching followers data');
+    }
+
+    const followersIds = followersData.map((follow) => follow.uid1);
+
+    // 4. Fetch the username for the users the current user is following
+    const { data: followingUsers, error: followingUsersError } = await supabase
+        .from('users')
+        .select('uid, username')
+        .in('uid', followingIds);
+
+    if (followingUsersError) {
+        console.error(
+            'Error fetching following users:',
+            followingUsersError.message
+        );
+        return res.status(500).send('Error fetching following users');
+    }
+
+    // 5. Fetch the username for the users who are following the current user
+    const { data: followersUsers, error: followersUsersError } = await supabase
+        .from('users')
+        .select('uid, username')
+        .in('uid', followersIds);
+
+    if (followersUsersError) {
+        console.error(
+            'Error fetching followers users:',
+            followersUsersError.message
+        );
+        return res.status(500).send('Error fetching followers users');
+    }
+
+    // Render the profile page with the fetched data
+    res.render('profile_self', {
+        profile,
+        following: followingUsers || [],
+        followers: followersUsers || [],
+    });
+});
+
 app.post('/update-bio/:uid', async (req, res) => {
     const uid = req.params.uid;
     const bio = req.body.bio;
