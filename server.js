@@ -231,6 +231,106 @@ app.post('/unban/:uid', async (req, res) => {
     res.send('User has been unbanned successfully.');
 });
 
+// Remove a post
+app.post('/remove-post/:pid', async (req, res) => {
+    if (!req.session.admin || !req.session.admin.AID) {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const pid = req.params.pid;
+    const { reason } = req.body;
+    const aid = req.session.admin.AID;
+
+    if (!reason || reason.trim() === '') {
+        return res.status(400).send('Reason for removing the post is required.');
+    }
+
+    // Check if the post exists
+    const { data: post, error: postError } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('pid', pid)
+        .single();
+
+    if (postError || !post) {
+        return res.status(404).send('Post not found.');
+    }
+
+    // Insert into the Removed_Posts table
+    const { error: removeError } = await supabase
+        .from('removed_posts')
+        .insert([{ pid, aid, reason }]);
+
+    if (removeError) {
+        console.error('Error removing post:', removeError);
+        return res.status(500).send('Failed to remove post.');
+    }
+
+    // Delete the post from the Posts table
+    const { error: deleteError } = await supabase
+        .from('posts')
+        .delete()
+        .eq('pid', pid);
+
+    if (deleteError) {
+        console.error('Error deleting post:', deleteError);
+        return res.status(500).send('Failed to delete post.');
+    }
+
+    res.send('Post has been removed successfully.');
+});
+
+// Unremove a post
+app.post('/unremove-post/:pid', async (req, res) => {
+    if (!req.session.admin || !req.session.admin.AID) {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const pid = req.params.pid;
+
+    // Check if the post is in the Removed_Posts table
+    const { data: removedPost, error: removedPostError } = await supabase
+        .from('removed_posts')
+        .select('*')
+        .eq('pid', pid)
+        .single();
+
+    if (removedPostError || !removedPost) {
+        return res.status(404).send('Post is not in the removed posts list.');
+    }
+
+    // Reinsert the post into the Posts table
+    const { error: restoreError } = await supabase
+        .from('posts')
+        .insert({
+            pid: removedPost.pid,
+            content: removedPost.content,
+            date: removedPost.date,
+            views: removedPost.views,
+            likes: removedPost.likes,
+            shares: removedPost.shares,
+            uid: removedPost.uid,
+        });
+
+    if (restoreError) {
+        console.error('Error restoring post:', restoreError);
+        return res.status(500).send('Failed to restore post.');
+    }
+
+    // Remove the post from the Removed_Posts table
+    const { error: deleteRemovedError } = await supabase
+        .from('removed_posts')
+        .delete()
+        .eq('pid', pid);
+
+    if (deleteRemovedError) {
+        console.error('Error deleting removed post record:', deleteRemovedError);
+        return res.status(500).send('Failed to delete removed post record.');
+    }
+
+    res.send('Post has been restored successfully.');
+});
+
 app.get('/post/:id', async (req, res) => {
     if (!req.session.user) {
         return res.redirect('/');
