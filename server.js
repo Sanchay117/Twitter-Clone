@@ -324,25 +324,17 @@ app.post('/like/:pid', async (req, res) => {
     return res.redirect(`/post/${pid}`);
 });
 
-app.post('/add-friend/:pid', async (req, res) => {
+app.post('/add-friend/:uid', async (req, res) => {
     if (!req.session.user || !req.session.user.ID) {
         return res.redirect('/');
     }
 
-    const pid = req.params.pid;
-    const uid = req.session.user.ID;
-
-    const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('pid', pid);
-    if (error || !data) {
-        return res.status(404).send('Post not found');
-    }
+    const uid2 = req.params.uid;
+    const uid1 = req.session.user.ID;
 
     const { friendError } = await supabase
         .from('friends')
-        .insert({ uid1: uid, uid2: data[0].uid });
+        .insert({ uid1, uid2 });
 
     if (friendError) {
         console.error('Supabase Friend error:', friendError);
@@ -351,7 +343,7 @@ app.post('/add-friend/:pid', async (req, res) => {
             .send({ message: 'Friend failed', error: friendError });
     }
 
-    return res.redirect(`/post/${pid}`);
+    return res.redirect(`/profile/${uid2}`);
 });
 
 app.post('/report/:pid', async (req, res) => {

@@ -38,6 +38,8 @@ function formatTimeAgo(datetimeStr) {
         const postsData = await postsRes.json();
         const posts = postsData.data;
 
+        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         posts.forEach((post) => {
             const postDiv = document.createElement('div');
             postDiv.className = 'tweet';
