@@ -150,6 +150,98 @@ app.post('/admin/login', async (req, res) => {
     res.send('Admin logged in');
 });
 
+// View all reports (Admin only)
+app.get('/admin/reports', async (req, res) => {
+    if (!req.session.admin) {
+        return res.status(403).send('Access denied. Admins only.');
+    }
+
+    const { data, error } = await supabase
+        .from('reports')
+        .select(`
+            uid,
+            pid,
+            reason,
+            date,
+            users:uid (
+                username
+            ),
+            posts:pid (
+                content
+            )
+        `)
+        .order('date', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching reports:', error.message);
+        return res.status(500).send('Failed to load reports');
+    }
+
+    res.render('report', {reports: data})
+});
+
+app.get('/admin/banned-users', async (req, res) => {
+    if (!req.session.admin) {
+        return res.status(403).send('Access denied. Admins only.');
+    }
+
+    const { data, error } = await supabase
+        .from('banned')
+        .select(`
+            uid,
+            aid,
+            reason,
+            date,
+            users:uid (
+                username
+            ),
+            admins:aid (
+                aid
+            )
+        `)
+        .order('date', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching banned users:', error.message);
+        return res.status(500).send('Failed to load banned users');
+    }
+
+    res.render('bannedUsers', { banned: data });
+});
+
+app.get('/admin/removed-posts', async (req, res) => {
+    if (!req.session.admin) {
+        return res.status(403).send('Access denied. Admins only.');
+    }
+
+    const { data, error } = await supabase
+        .from('removed_posts')
+        .select(`
+            pid,
+            aid,
+            reason,
+            date,
+            posts:pid (
+                content,
+                uid
+            ),
+            admins:aid (
+                aid
+            ),
+            users:posts.uid (
+                username
+            )
+        `)
+        .order('date', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching removed posts:', error.message);
+        return res.status(500).send('Failed to load removed posts');
+    }
+
+    res.render('removedPosts', { posts: data });
+});
+
 app.post('/create', async (req, res) => {
     const uID = req.session.user.ID;
     const { tweet } = req.body;
