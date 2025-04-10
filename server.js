@@ -112,6 +112,28 @@ app.post('/signup', async (req, res) => {
     res.redirect('/login');
 });
 
+// Admin login
+app.post('/admin/login', async (req, res) => {
+    const { password } = req.body;
+
+    if (!aid || !password) {
+        return res.status(400).send('Admin password required.');
+    }
+
+    const { data, error } = await supabase
+        .from('Admins')
+        .select('*')
+        .eq('Password', password)
+        .single();
+
+    if (error || !data || data.Password !== password) {
+        return res.status(401).send('Invalid admin credentials.');
+    }
+
+    req.session.admin = { AID: data.AID };
+    res.send('Admin logged in');
+});
+
 app.post('/create', async (req, res) => {
     const uID = req.session.user.ID;
     const { tweet } = req.body;
