@@ -121,12 +121,12 @@ app.post('/admin/login', async (req, res) => {
     }
 
     const { data, error } = await supabase
-        .from('Admins')
+        .from('admins')
         .select('*')
-        .eq('Password', password)
+        .eq('password', password)
         .single();
 
-    if (error || !data || data.Password !== password) {
+    if (error || !data || data.password !== password) {
         return res.status(401).send('Invalid admin credentials.');
     }
 
