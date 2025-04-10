@@ -97,6 +97,19 @@
                             </button>
                         </form>
                         <% } %>
+                        <!-- Follow/Unfollow -->
+                        <% if(post.uid !== uid) { %>
+                        <form method="POST" action="/follow/<%= post.uid %>">
+                            <button
+                                type="submit"
+                                class="btn btn-sm d-flex align-items-center rounded-pill px-3 <%= isFollowing ? 'btn-danger' : 'btn-success' %>"
+                                style="height: 38px"
+                            >
+                                <%= isFollowing ? 'Unfollow' : 'Follow' %>
+                            </button>
+                        </form>
+                        <% } %>
+
                         <!-- Add Friend -->
                         <% if (post.uid !== uid) { %> <% if (!isFriend) { %>
                         <form

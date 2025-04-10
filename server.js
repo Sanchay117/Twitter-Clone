@@ -321,6 +321,23 @@ app.post('/like/:pid', async (req, res) => {
             .send({ message: 'Like failed', error: updateError });
     }
 
+    if (uid !== data[0].uid) {
+        const { error } = await supabase.from('notification').insert({
+            uid: data[0].uid,
+            sid: uid,
+            type: 'Like',
+            pid: data[0].pid,
+            content: `${req.session.user.username} Liked your post.`,
+            isread: false,
+        });
+        if (error) {
+            console.error('Supabase Like error:', error);
+            return res
+                .status(500)
+                .send({ message: 'Like failed', error: error });
+        }
+    }
+
     return res.redirect(`/post/${pid}`);
 });
 
@@ -398,6 +415,31 @@ app.post('/post/:id', async (req, res) => {
         if (error) {
             console.error(error);
             return res.status(500).send('Error adding comment');
+        }
+
+        const { data: post, error: pError } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('pid', postId);
+
+        if (!post || pError) {
+            console.log(pError);
+            return res.status(404).send('Post Not Found');
+        }
+
+        const { error2 } = await supabase.from('notification').insert({
+            uid: post[0].uid,
+            sid: userId,
+            type: 'Comment',
+            pid: post[0].pid,
+            content: `${req.session.user.username} commented your post.`,
+            isread: false,
+        });
+        if (error2) {
+            console.error('Supabase comment error:', error2);
+            return res
+                .status(500)
+                .send({ message: 'comment failed', error: error2 });
         }
 
         res.redirect(`/post/${postId}`); // Redirect back to the post page
@@ -553,6 +595,18 @@ app.post('/follow/:id', async (req, res) => {
         await supabase
             .from('follows')
             .insert([{ uid1: currentUserId, uid2: targetId }]);
+    }
+
+    const { error } = await supabase.from('notification').insert({
+        uid: targetId,
+        sid: currentUserId,
+        type: 'Follow',
+        content: `${req.session.user.username} started following you.`,
+        isread: false,
+    });
+    if (error) {
+        console.error('Supabase follow error:', error);
+        return res.status(500).send({ message: 'follow failed', error: error });
     }
 
     res.redirect('/profile/' + targetId);
@@ -770,6 +824,10 @@ app.get('/api/posts', async (req, res) => {
     } else {
         res.json({ data: data });
     }
+});
+
+app.use((req, res, next) => {
+    res.redirect('/');
 });
 
 app.listen(PORT, () => {
