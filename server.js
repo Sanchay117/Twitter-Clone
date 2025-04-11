@@ -210,23 +210,40 @@ app.get('/admin', async (req, res) => {
 });
 
 // keerat's and ryan's code below
-
+// being used
 app.post('/admin/remove-post/:pid', async (req, res) => {
+    if (!req.session.admin) {
+        return res.redirect('/admin/login');
+    }
     const pid = req.params.pid;
-    const aid = req.session.adminId; // or however you store it
+    const aid = req.session.admin.AID;
     const reason = req.body.reason;
 
-    await supabase
+    const { data, error } = await supabase
         .from('removed_posts')
-        .insert([{ pid, aid, reason, date: new Date() }]);
-    await supabase.from('posts').delete().eq('pid', pid);
+        .insert({ pid, aid, reason });
 
-    res.redirect('/admin');
+    const { error2 } = await supabase.from('reports').delete().eq('pid', pid);
+
+    if (error2) {
+        console.error('Error deleting report:', error.message);
+        return res.status(500).send('Could not remove post');
+    }
+
+    if (error) {
+        console.error(error);
+        return res.status(500).send('Could not remove post');
+    }
+
+    res.redirect('/admin/reports');
 });
 
 app.post('/admin/ban-user/:uid', async (req, res) => {
+    if (!req.session.admin) {
+        return res.redirect('/admin/login');
+    }
     const uid = req.params.uid;
-    const aid = req.session.adminId;
+    const aid = req.session.admin.AID;
     const reason = req.body.reason;
 
     await supabase
@@ -245,10 +262,10 @@ app.post('/admin/unban-user/:uid', async (req, res) => {
     res.redirect('/admin');
 });
 
-// View all reports (Admin only)
+// View all reports (Admin only) -> being used
 app.get('/admin/reports', async (req, res) => {
     if (!req.session.admin) {
-        return res.status(403).send('Access denied. Admins only.');
+        return res.redirect('/admin/login');
     }
 
     const { data, error } = await supabase
@@ -274,7 +291,68 @@ app.get('/admin/reports', async (req, res) => {
         return res.status(500).send('Failed to load reports');
     }
 
-    console.log(data);
+    for (const report of data) {
+        const { data: authorData, error: idErr } = await supabase
+            .from('posts')
+            .select(
+                `
+                uid,
+                users:uid(username)
+            `
+            )
+            .eq('pid', report.pid)
+            .single();
+
+        if (idErr || !authorData) {
+            console.error('Error fetching author data:', idErr?.message);
+            return res.status(404).send('Error fetching author data...');
+        }
+
+        const { data: removeData, error: removeError } = await supabase
+            .from('removed_posts')
+            .select('*')
+            .eq('pid', report.pid)
+            .single();
+
+        if (removeError && removeError.code !== 'PGRST116') {
+            console.error(
+                'Supabase error while checking removed_posts:',
+                removeError.message
+            );
+            return res.status(500).send('An error occured');
+        } else if (removeData) {
+            // Found a matching removed post
+            report.isRemoved = true;
+        } else {
+            // Not found (removeData is null or undefined)
+            report.isRemoved = false;
+        }
+
+        report.authorID = authorData.uid;
+        report.authorUsername = authorData.users.username;
+
+        const { data: bannedData, error: bannedError } = await supabase
+            .from('banned')
+            .select('*')
+            .eq('uid', report.authorID)
+            .single();
+
+        if (bannedError && bannedError.code !== 'PGRST116') {
+            console.error(
+                'Supabase error while checking removed_posts:',
+                bannedError.message
+            );
+            return res.status(500).send('An error occured');
+        } else if (bannedData) {
+            // Found a matching removed post
+            report.isBanned = true;
+        } else {
+            // Not found (bannedData is null or undefined)
+            report.isBanned = false;
+        }
+    }
+
+    // console.log(data);
 
     res.render('reports', { reports: data });
 });

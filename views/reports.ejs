@@ -60,24 +60,68 @@
                         <div class="card-body">
                             <p><strong>Post ID:</strong> <%= report.pid %></p>
                             <p>
-                                <strong>Content:</strong> <%=
-                                report.posts.content || "Content unavailable" %>
+                                <strong>Author: </strong> <%=
+                                report.authorUsername %>
+                                <em>(ID: <%= report.authorID %>)</em>
+                            </p>
+                            <p>
+                                <strong>Content:</strong>
+                                <%= report.posts.content || "Content unavailable" %>
                             </p>
                             <p>
                                 <strong>Reported By (UID, Username):</strong>
-                                <%= report.uid %> , <%= report.users.username %>
+                                <%= report.uid %> , <%= report.users.username ||
+                                "unknown" %>
                             </p>
                             <p><strong>Reason:</strong> <%= report.reason %></p>
                             <p><strong>Date:</strong> <%= report.date %></p>
 
-                            <form
-                                action="/unremove-post/<%= report.pid %>"
-                                method="POST"
-                            >
-                                <button class="btn btn-success btn-sm">
-                                    Restore Post
-                                </button>
-                            </form>
+                            <% if (!report.isRemoved) { %>
+                                <form
+                                    action="/admin/remove-post/<%= report.pid %>"
+                                    method="POST"
+                                    class="d-flex flex-wrap align-items-center gap-2 mb-2"
+                                >
+                                    <input
+                                        type="text"
+                                        name="reason"
+                                        class="form-control w-50"
+                                        placeholder="Reason for removal"
+                                        required
+                                    />
+                                    <button class="btn btn-danger btn-sm">Remove Post</button>
+                                </form>
+                            <% } else { %>
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        Post Already Removed
+                                    </button>
+                                </div>
+                            <% } %>
+                            
+                            <% if (!report.isBanned) { %>
+                                <form
+                                    action="/admin/ban-user/<%= report.authorID %>"
+                                    method="POST"
+                                    class="d-flex flex-wrap align-items-center gap-2"
+                                >
+                                    <input
+                                        type="text"
+                                        name="reason"
+                                        class="form-control w-50"
+                                        placeholder="Reason for ban"
+                                        required
+                                    />
+                                    <button class="btn btn-warning btn-sm">Ban Author</button>
+                                </form>
+                            <% } else { %>
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        Author Already Banned
+                                    </button>
+                                </div>
+                            <% } %>
+                            
                         </div>
                     </div>
                     <% }) %> <% } %>
