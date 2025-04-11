@@ -499,28 +499,18 @@ app.post('/unremove-post/:pid', async (req, res) => {
     // Check if the post is in the Removed_Posts table
     const { data: removedPost, error: removedPostError } = await supabase
         .from('removed_posts')
-        .select('*')
+        .select(
+            `*,
+        posts (
+            content,
+            uid
+        )`
+        )
         .eq('pid', pid)
         .single();
 
     if (removedPostError || !removedPost) {
         return res.status(404).send('Post is not in the removed posts list.');
-    }
-
-    // Reinsert the post into the Posts table
-    const { error: restoreError } = await supabase.from('posts').insert({
-        pid: removedPost.pid,
-        content: removedPost.content,
-        date: removedPost.date,
-        views: removedPost.views,
-        likes: removedPost.likes,
-        shares: removedPost.shares,
-        uid: removedPost.uid,
-    });
-
-    if (restoreError) {
-        console.error('Error restoring post:', restoreError);
-        return res.status(500).send('Failed to restore post.');
     }
 
     // Remove the post from the Removed_Posts table
