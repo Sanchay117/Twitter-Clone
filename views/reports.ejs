@@ -43,15 +43,13 @@
                 <!-- Admin Dashboard -->
                 <div class="col-8 middle-col">
                     <h2 class="text-light mb-4">
-                        <i class="fa-solid fa-shield-halved"></i> Admin
-                        Dashboard
+                        <i class="fa-solid fa-shield-halved"></i> View Reports
                     </h2>
 
-                    <!-- Banned Users -->
-                    <h4 class="text-light mt-5 mb-3">Banned Users</h4>
-                    <% if (bannedUsers.length === 0) { %>
-                    <p class="text-muted">No banned users.</p>
-                    <% } else { %> <% bannedUsers.forEach(user => { %>
+                    <!-- Reports -->
+                    <% if (reports.length === 0) { %>
+                    <p class="text-muted">No posts have been reported.</p>
+                    <% } else { %> <% reports.forEach(report => { %>
                     <div
                         class="card mb-3"
                         style="
@@ -60,48 +58,20 @@
                         "
                     >
                         <div class="card-body">
-                            <p><strong>UID:</strong> <%= user.uid %></p>
-                            <p><strong>Reason:</strong> <%= user.reason %></p>
-                            <p><strong>Date:</strong> <%= user.date %></p>
-                            <form
-                                action="/admin/unban-user/<%= user.uid %>"
-                                method="POST"
-                            >
-                                <button class="btn btn-success btn-sm">
-                                    Unban
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <% }) %> <% } %>
-
-                    <!-- removed posts -->
-                    <h4 class="text-light mt-5 mb-3">Removed Posts</h4>
-                    <% if (removedPosts.length === 0) { %>
-                    <p class="text-muted">No posts have been removed.</p>
-                    <% } else { %> <% removedPosts.forEach(post => { %>
-                    <div
-                        class="card mb-3"
-                        style="
-                            background-color: var(--tweet-bg);
-                            color: var(--text-color);
-                        "
-                    >
-                        <div class="card-body">
-                            <p><strong>Post ID:</strong> <%= post.pid %></p>
+                            <p><strong>Post ID:</strong> <%= report.pid %></p>
                             <p>
-                                <strong>Content:</strong> <%= post.posts.content
-                                || "Content unavailable" %>
+                                <strong>Content:</strong> <%=
+                                report.posts.content || "Content unavailable" %>
                             </p>
                             <p>
-                                <strong>Removed By Admin (AID):</strong> <%=
-                                post.aid %>
+                                <strong>Reported By (UID, Username):</strong>
+                                <%= report.uid %> , <%= report.users.username %>
                             </p>
-                            <p><strong>Reason:</strong> <%= post.reason %></p>
-                            <p><strong>Date:</strong> <%= post.date %></p>
+                            <p><strong>Reason:</strong> <%= report.reason %></p>
+                            <p><strong>Date:</strong> <%= report.date %></p>
 
                             <form
-                                action="/unremove-post/<%= post.pid %>"
+                                action="/unremove-post/<%= report.pid %>"
                                 method="POST"
                             >
                                 <button class="btn btn-success btn-sm">

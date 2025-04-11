@@ -237,6 +237,9 @@ app.post('/admin/ban-user/:uid', async (req, res) => {
 
 // being used
 app.post('/admin/unban-user/:uid', async (req, res) => {
+    if (!req.session.admin || !req.session.admin.AID) {
+        return res.status(401).send('Unauthorized');
+    }
     const uid = req.params.uid;
     await supabase.from('banned').delete().eq('uid', uid);
     res.redirect('/admin');
@@ -271,7 +274,9 @@ app.get('/admin/reports', async (req, res) => {
         return res.status(500).send('Failed to load reports');
     }
 
-    res.render('report', { reports: data });
+    console.log(data);
+
+    res.render('reports', { reports: data });
 });
 
 app.get('/admin/banned-users', async (req, res) => {
@@ -404,39 +409,6 @@ app.post('/ban/:uid', async (req, res) => {
     res.send('User has been banned successfully.');
 });
 
-// Unban a user
-app.post('/unban/:uid', async (req, res) => {
-    if (!req.session.admin || !req.session.admin.AID) {
-        return res.status(401).send('Unauthorized');
-    }
-
-    const uid = req.params.uid;
-
-    // Check if the user is banned
-    const { data: bannedUser, error: bannedError } = await supabase
-        .from('banned')
-        .select('*')
-        .eq('uid', uid)
-        .single();
-
-    if (bannedError || !bannedUser) {
-        return res.status(404).send('User is not banned.');
-    }
-
-    // Remove the user from the Banned table
-    const { error: unbanError } = await supabase
-        .from('banned')
-        .delete()
-        .eq('uid', uid);
-
-    if (unbanError) {
-        console.error('Error unbanning user:', unbanError);
-        return res.status(500).send('Failed to unban user.');
-    }
-
-    res.send('User has been unbanned successfully.');
-});
-
 // Remove a post
 app.post('/remove-post/:pid', async (req, res) => {
     if (!req.session.admin || !req.session.admin.AID) {
@@ -530,6 +502,12 @@ app.post('/unremove-post/:pid', async (req, res) => {
     res.redirect('/admin');
 });
 
+// _________                    .__                     __  .__                                           __
+// /   _____/____    ____   ____ |  |__ _____  ___.__. _/  |_|  |__   ____      ___________   ____ _____ _/  |_
+// \_____  \\__  \  /    \_/ ___\|  |  \\__  \<   |  | \   __\  |  \_/ __ \    / ___\_  __ \_/ __ \\__  \\   __\
+// /        \/ __ \|   |  \  \___|   Y  \/ __ \\___  |  |  | |   Y  \  ___/   / /_/  >  | \/\  ___/ / __ \|  |
+// /_______  (____  /___|  /\___  >___|  (____  / ____|  |__| |___|  /\___  >  \___  /|__|    \___  >____  /__|
+//        \/     \/     \/     \/     \/     \/\/                 \/     \/  /_____/             \/     \/
 // sanchays code below
 
 app.get('/post/:id', async (req, res) => {
