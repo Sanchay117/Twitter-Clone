@@ -159,7 +159,81 @@ app.post('/admin/login', async (req, res) => {
     }
 
     req.session.admin = { AID: data.aid };
-    res.send('Admin logged in');
+    res.redirect('/admin');
+});
+
+app.get('/admin/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).send('Error logging out');
+        }
+        res.redirect('/admin/login'); // or your main login page
+    });
+});
+
+app.get('/admin', async (req, res) => {
+    if (!req.session.admin) {
+        return res.redirect('/admin/login');
+    }
+
+    // Optional: add admin auth check
+    const { data: reports, error: reportsError } = await supabase
+        .from('reports')
+        .select('uid, pid, reason, date');
+
+    if (reportsError) {
+        console.error(reportsError);
+        return res.status(500).send('Could not fetch reports');
+    }
+
+    const postIds = reports.map((r) => r.pid);
+    const userIds = reports.map((r) => r.uid);
+
+    const { data: posts } = await supabase
+        .from('posts')
+        .select('pid, content, user_id')
+        .in('pid', postIds);
+
+    const { data: bannedUsers } = await supabase
+        .from('banned')
+        .select('uid, reason, date');
+
+    res.render('admin', {
+        reports,
+        posts: posts || [],
+        bannedUsers: bannedUsers || [],
+    });
+});
+
+app.post('/admin/remove-post/:pid', async (req, res) => {
+    const pid = req.params.pid;
+    const aid = req.session.adminId; // or however you store it
+    const reason = req.body.reason;
+
+    await supabase
+        .from('removed_posts')
+        .insert([{ pid, aid, reason, date: new Date() }]);
+    await supabase.from('posts').delete().eq('pid', pid);
+
+    res.redirect('/admin');
+});
+
+app.post('/admin/ban-user/:uid', async (req, res) => {
+    const uid = req.params.uid;
+    const aid = req.session.adminId;
+    const reason = req.body.reason;
+
+    await supabase
+        .from('banned')
+        .insert([{ uid, reason, aid, date: new Date() }]);
+    res.redirect('/admin');
+});
+
+app.post('/admin/unban-user/:uid', async (req, res) => {
+    const uid = req.params.uid;
+    await supabase.from('banned').delete().eq('uid', uid);
+    res.redirect('/admin');
 });
 
 // View all reports (Admin only)
