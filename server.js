@@ -177,34 +177,39 @@ app.get('/admin', async (req, res) => {
         return res.redirect('/admin/login');
     }
 
-    // Optional: add admin auth check
-    const { data: reports, error: reportsError } = await supabase
-        .from('reports')
-        .select('uid, pid, reason, date');
-
-    if (reportsError) {
-        console.error(reportsError);
-        return res.status(500).send('Could not fetch reports');
-    }
-
-    const postIds = reports.map((r) => r.pid);
-    const userIds = reports.map((r) => r.uid);
-
-    const { data: posts } = await supabase
-        .from('posts')
-        .select('pid, content, user_id')
-        .in('pid', postIds);
-
-    const { data: bannedUsers } = await supabase
+    const { data: bannedUsers, error } = await supabase
         .from('banned')
         .select('uid, reason, date');
 
+    if (error) {
+        console.error(error);
+        return res.status(500).send('Could not fetch banned users');
+    }
+
+    const { data: removedPosts, error: removedPostError } = await supabase.from(
+        'removed_posts'
+    ).select(`
+        *,
+        posts (
+            content,
+            uid
+        )
+    `);
+
+    // console.log(removedPosts);
+
+    if (removedPostError) {
+        console.log(removedPostError);
+        return res.status(500).send('Could not fetch removed posts');
+    }
+
     res.render('admin', {
-        reports,
-        posts: posts || [],
         bannedUsers: bannedUsers || [],
+        removedPosts: removedPosts || [],
     });
 });
+
+// keerat's and ryan's code below
 
 app.post('/admin/remove-post/:pid', async (req, res) => {
     const pid = req.params.pid;
@@ -230,6 +235,7 @@ app.post('/admin/ban-user/:uid', async (req, res) => {
     res.redirect('/admin');
 });
 
+// being used
 app.post('/admin/unban-user/:uid', async (req, res) => {
     const uid = req.params.uid;
     await supabase.from('banned').delete().eq('uid', uid);
@@ -482,7 +488,7 @@ app.post('/remove-post/:pid', async (req, res) => {
     res.send('Post has been removed successfully.');
 });
 
-// Unremove a post
+// Unremove a post -> being used
 app.post('/unremove-post/:pid', async (req, res) => {
     if (!req.session.admin || !req.session.admin.AID) {
         return res.status(401).send('Unauthorized');
@@ -531,8 +537,10 @@ app.post('/unremove-post/:pid', async (req, res) => {
         return res.status(500).send('Failed to delete removed post record.');
     }
 
-    res.send('Post has been restored successfully.');
+    res.redirect('/admin');
 });
+
+// sanchays code below
 
 app.get('/post/:id', async (req, res) => {
     if (!req.session.user) {

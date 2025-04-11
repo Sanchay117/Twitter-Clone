@@ -20,6 +20,11 @@
                     </h4>
                     <ul class="nav flex-column">
                         <li class="nav-item mb-2">
+                            <a href="/admin/reports" class="nav-link text-light"
+                                >Reports</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
                             <a href="/admin/logout" class="nav-link text-light"
                                 >Logout</a
                             >
@@ -36,68 +41,6 @@
                         <i class="fa-solid fa-shield-halved"></i> Admin
                         Dashboard
                     </h2>
-
-                    <!-- Reported Posts -->
-                    <h4 class="text-light mb-3">Reported Posts</h4>
-                    <% reports.forEach(report => { const post = posts.find(p =>
-                    p.pid === report.pid); %>
-                    <div
-                        class="card mb-3"
-                        style="
-                            background-color: var(--tweet-bg);
-                            color: var(--text-color);
-                        "
-                    >
-                        <div class="card-body">
-                            <p>
-                                <strong>Post:</strong> <%= post?.content ||
-                                'Post not found' %>
-                            </p>
-                            <p>
-                                <strong>Reported by UID:</strong> <%= report.uid
-                                %>
-                            </p>
-                            <p><strong>Reason:</strong> <%= report.reason %></p>
-                            <p><strong>Date:</strong> <%= report.date %></p>
-
-                            <% if (post) { %>
-                            <form
-                                action="/admin/remove-post/<%= post.pid %>"
-                                method="POST"
-                                class="d-flex flex-wrap align-items-center gap-2 mb-2"
-                            >
-                                <input
-                                    type="text"
-                                    name="reason"
-                                    placeholder="Reason for removal"
-                                    class="form-control w-50"
-                                    required
-                                />
-                                <button class="btn btn-danger btn-sm">
-                                    Remove Post
-                                </button>
-                            </form>
-
-                            <form
-                                action="/admin/ban-user/<%= post.user_id %>"
-                                method="POST"
-                                class="d-flex flex-wrap align-items-center gap-2"
-                            >
-                                <input
-                                    type="text"
-                                    name="reason"
-                                    placeholder="Reason for ban"
-                                    class="form-control w-50"
-                                    required
-                                />
-                                <button class="btn btn-warning btn-sm">
-                                    Ban User
-                                </button>
-                            </form>
-                            <% } %>
-                        </div>
-                    </div>
-                    <% }) %>
 
                     <!-- Banned Users -->
                     <h4 class="text-light mt-5 mb-3">Banned Users</h4>
@@ -121,6 +64,43 @@
                             >
                                 <button class="btn btn-success btn-sm">
                                     Unban
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <% }) %> <% } %>
+
+                    <!-- removed posts -->
+                    <h4 class="text-light mt-5 mb-3">Removed Posts</h4>
+                    <% if (removedPosts.length === 0) { %>
+                    <p class="text-muted">No posts have been removed.</p>
+                    <% } else { %> <% removedPosts.forEach(post => { %>
+                    <div
+                        class="card mb-3"
+                        style="
+                            background-color: var(--tweet-bg);
+                            color: var(--text-color);
+                        "
+                    >
+                        <div class="card-body">
+                            <p><strong>Post ID:</strong> <%= post.pid %></p>
+                            <p>
+                                <strong>Content:</strong> <%= post.posts.content
+                                || "Content unavailable" %>
+                            </p>
+                            <p>
+                                <strong>Removed By Admin (AID):</strong> <%=
+                                post.aid %>
+                            </p>
+                            <p><strong>Reason:</strong> <%= post.reason %></p>
+                            <p><strong>Date:</strong> <%= post.date %></p>
+
+                            <form
+                                action="/unremove-post/<%= post.pid %>"
+                                method="POST"
+                            >
+                                <button class="btn btn-success btn-sm">
+                                    Restore Post
                                 </button>
                             </form>
                         </div>
