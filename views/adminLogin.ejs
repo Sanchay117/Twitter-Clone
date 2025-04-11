@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login | Twit</title>
+        <link
+            rel="stylesheet"
+            href="/bootstrap-5.3.3-dist/css/bootstrap.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link rel="stylesheet" href="/styles/login.css" />
+    </head>
+    <body>
+        <div class="login-container animate__animated animate__fadeIn">
+            <div class="login-header">
+                <i class="fa-brands fa-twitter"></i>
+                <h2>Twit</h2>
+            </div>
+            <form action="/admin/login" method="POST">
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        required
+                    />
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-custom btn-lg">
+                        Login
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/420dd176dc.js"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>

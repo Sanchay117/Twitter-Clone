@@ -68,6 +68,8 @@ app.post('/login', async (req, res) => {
         return res.send('Invalid credentials');
     }
 
+    // console.log(data);
+
     // Check if the user is banned
     const { data: bannedUser, error: bannedError } = await supabase
         .from('banned')
@@ -76,12 +78,18 @@ app.post('/login', async (req, res) => {
         .single();
 
     if (bannedError) {
-        console.error('Error checking banned status:', bannedError);
-        return res.status(500).send('Internal server error');
+        if (bannedError.code === 'PGRST116') {
+            // Not banned – no row found
+        } else {
+            console.error('Error checking banned status:', bannedError);
+            return res.status(500).send('Internal server error');
+        }
     }
 
     if (bannedUser) {
-        return res.status(403).send(`You are banned. Reason: ${bannedUser.reason}`);
+        return res
+            .status(403)
+            .send(`You are banned. Reason: ${bannedUser.reason}`);
     }
 
     const ID = data.uid;
@@ -128,6 +136,10 @@ app.post('/signup', async (req, res) => {
     res.redirect('/login');
 });
 
+app.get('/admin/login', (req, res) => {
+    res.render('adminLogin.ejs');
+});
+
 // Admin login
 app.post('/admin/login', async (req, res) => {
     const { password } = req.body;
@@ -146,7 +158,7 @@ app.post('/admin/login', async (req, res) => {
         return res.status(401).send('Invalid admin credentials.');
     }
 
-    req.session.admin = { AID: data.AID };
+    req.session.admin = { AID: data.aid };
     res.send('Admin logged in');
 });
 
@@ -158,7 +170,8 @@ app.get('/admin/reports', async (req, res) => {
 
     const { data, error } = await supabase
         .from('reports')
-        .select(`
+        .select(
+            `
             uid,
             pid,
             reason,
@@ -169,7 +182,8 @@ app.get('/admin/reports', async (req, res) => {
             posts:pid (
                 content
             )
-        `)
+        `
+        )
         .order('date', { ascending: false });
 
     if (error) {
@@ -177,7 +191,7 @@ app.get('/admin/reports', async (req, res) => {
         return res.status(500).send('Failed to load reports');
     }
 
-    res.render('report', {reports: data})
+    res.render('report', { reports: data });
 });
 
 app.get('/admin/banned-users', async (req, res) => {
@@ -187,7 +201,8 @@ app.get('/admin/banned-users', async (req, res) => {
 
     const { data, error } = await supabase
         .from('banned')
-        .select(`
+        .select(
+            `
             uid,
             aid,
             reason,
@@ -198,7 +213,8 @@ app.get('/admin/banned-users', async (req, res) => {
             admins:aid (
                 aid
             )
-        `)
+        `
+        )
         .order('date', { ascending: false });
 
     if (error) {
@@ -216,7 +232,8 @@ app.get('/admin/removed-posts', async (req, res) => {
 
     const { data, error } = await supabase
         .from('removed_posts')
-        .select(`
+        .select(
+            `
             pid,
             aid,
             reason,
@@ -231,7 +248,8 @@ app.get('/admin/removed-posts', async (req, res) => {
             users:posts.uid (
                 username
             )
-        `)
+        `
+        )
         .order('date', { ascending: false });
 
     if (error) {
@@ -350,7 +368,9 @@ app.post('/remove-post/:pid', async (req, res) => {
     const aid = req.session.admin.AID;
 
     if (!reason || reason.trim() === '') {
-        return res.status(400).send('Reason for removing the post is required.');
+        return res
+            .status(400)
+            .send('Reason for removing the post is required.');
     }
 
     // Check if the post exists
@@ -408,17 +428,15 @@ app.post('/unremove-post/:pid', async (req, res) => {
     }
 
     // Reinsert the post into the Posts table
-    const { error: restoreError } = await supabase
-        .from('posts')
-        .insert({
-            pid: removedPost.pid,
-            content: removedPost.content,
-            date: removedPost.date,
-            views: removedPost.views,
-            likes: removedPost.likes,
-            shares: removedPost.shares,
-            uid: removedPost.uid,
-        });
+    const { error: restoreError } = await supabase.from('posts').insert({
+        pid: removedPost.pid,
+        content: removedPost.content,
+        date: removedPost.date,
+        views: removedPost.views,
+        likes: removedPost.likes,
+        shares: removedPost.shares,
+        uid: removedPost.uid,
+    });
 
     if (restoreError) {
         console.error('Error restoring post:', restoreError);
@@ -432,7 +450,10 @@ app.post('/unremove-post/:pid', async (req, res) => {
         .eq('pid', pid);
 
     if (deleteRemovedError) {
-        console.error('Error deleting removed post record:', deleteRemovedError);
+        console.error(
+            'Error deleting removed post record:',
+            deleteRemovedError
+        );
         return res.status(500).send('Failed to delete removed post record.');
     }
 
