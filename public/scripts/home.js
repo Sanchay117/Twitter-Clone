@@ -2,50 +2,6 @@ let username;
 let uID;
 const feed = document.querySelector('.feed');
 
-function formatTimeAgo(datetimeStr) {
-    const now = new Date();
-
-    // Fix datetime string by trimming to milliseconds (first 3 digits after dot)
-    const safeStr = datetimeStr.replace(/\.(\d{3})\d*/, '.$1');
-
-    const date = new Date(safeStr);
-    if (isNaN(date)) {
-        return {
-            formattedDate: 'Invalid date',
-            timeAgo: 'some time ago',
-        };
-    }
-
-    // 1. Format: e.g., Apr 8, 2025 12:42
-    const formattedDate = date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-
-    // 2. Time ago
-    const diffMs = now - date;
-    const diffSec = Math.floor(diffMs / 1000);
-    const diffMin = Math.floor(diffSec / 60);
-    const diffHr = Math.floor(diffMin / 60);
-    const diffDay = Math.floor(diffHr / 24);
-
-    let timeAgo = '';
-    if (diffSec < 60) {
-        timeAgo = `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
-    } else if (diffMin < 60) {
-        timeAgo = `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
-    } else if (diffHr < 24) {
-        timeAgo = `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
-    } else {
-        timeAgo = `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
-    }
-
-    return { formattedDate, timeAgo };
-}
-
 (async () => {
     try {
         const userRes = await fetch('/api/user');
@@ -59,7 +15,7 @@ function formatTimeAgo(datetimeStr) {
         const postsData = await postsRes.json();
         const posts = postsData.data;
 
-        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+        posts.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         posts.forEach((post) => {
             const postDiv = document.createElement('div');
