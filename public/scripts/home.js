@@ -64,10 +64,9 @@ function formatTimeAgo(datetimeStr) {
         posts.forEach((post) => {
             const postDiv = document.createElement('div');
             postDiv.className = 'tweet';
-            const { timeAgo } = formatTimeAgo(post.date);
 
             postDiv.innerHTML = `
-            <div class="tweet-author">@${post.users.username} <span class="tweet-time">· ${timeAgo}</span></div>
+            <div class="tweet-author">@${post.users.username} <span class="tweet-time">· ${post.date}</span></div>
             <div class="word-wrap">${post.content}</div>
             <div class="info mt-2 d-flex gap-3 text-muted small">
               <span><i class="fa-solid fa-heart"></i>${post.likes}</span>

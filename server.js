@@ -1433,6 +1433,10 @@ app.get('/api/posts', async (req, res) => {
     )
   	`);
 
+    data.forEach((el) => {
+        el.date = formatTimeAgo(el.date).timeAgo;
+    });
+
     if (error) {
         return res.status(500).send('Error Joining Tables');
     } else {
