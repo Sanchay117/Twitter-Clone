@@ -4,7 +4,28 @@ const feed = document.querySelector('.feed');
 
 function formatTimeAgo(datetimeStr) {
     const now = new Date();
-    const date = new Date(datetimeStr);
+
+    // Fix datetime string by trimming to milliseconds (first 3 digits after dot)
+    const safeStr = datetimeStr.replace(/\.(\d{3})\d*/, '.$1');
+
+    const date = new Date(safeStr);
+    if (isNaN(date)) {
+        return {
+            formattedDate: 'Invalid date',
+            timeAgo: 'some time ago',
+        };
+    }
+
+    // 1. Format: e.g., Apr 8, 2025 12:42
+    const formattedDate = date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    // 2. Time ago
     const diffMs = now - date;
     const diffSec = Math.floor(diffMs / 1000);
     const diffMin = Math.floor(diffSec / 60);
@@ -22,7 +43,7 @@ function formatTimeAgo(datetimeStr) {
         timeAgo = `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
     }
 
-    return { timeAgo };
+    return { formattedDate, timeAgo };
 }
 
 (async () => {
