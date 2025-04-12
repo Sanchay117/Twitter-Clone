@@ -127,3 +127,7 @@ body {
 .post-box .form-text {
     color: var(--timestamp-color);
 }
+
+.wrap {
+    word-wrap: break-word;
+}
