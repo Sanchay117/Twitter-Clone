@@ -1434,7 +1434,7 @@ app.get('/api/posts', async (req, res) => {
   	`);
 
     data.forEach((el) => {
-        el.date = formatTimeAgo(el.date).timeAgo;
+        el.date2 = formatTimeAgo(el.date).timeAgo;
     });
 
     if (error) {

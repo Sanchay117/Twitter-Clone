@@ -15,14 +15,14 @@ const feed = document.querySelector('.feed');
         const postsData = await postsRes.json();
         const posts = postsData.data;
 
-        posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         posts.forEach((post) => {
             const postDiv = document.createElement('div');
             postDiv.className = 'tweet';
 
             postDiv.innerHTML = `
-            <div class="tweet-author">@${post.users.username} <span class="tweet-time">· ${post.date}</span></div>
+            <div class="tweet-author">@${post.users.username} <span class="tweet-time">· ${post.date2}</span></div>
             <div class="word-wrap">${post.content}</div>
             <div class="info mt-2 d-flex gap-3 text-muted small">
               <span><i class="fa-solid fa-heart"></i>${post.likes}</span>
