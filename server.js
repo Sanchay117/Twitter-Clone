@@ -209,6 +209,16 @@ app.get('/admin/logout', (req, res) => {
     });
 });
 
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).send('Error logging out');
+        }
+        res.redirect('/login'); // or your main login page
+    });
+});
+
 app.get('/admin', async (req, res) => {
     if (!req.session.admin) {
         return res.redirect('/admin/login');
@@ -246,7 +256,6 @@ app.get('/admin', async (req, res) => {
     });
 });
 
-// keerat's and ryan's code below
 // being used
 app.post('/admin/remove-post/:pid', async (req, res) => {
     if (!req.session.admin) {
