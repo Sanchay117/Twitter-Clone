@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Home</title>
+        <link
+            rel="stylesheet"
+            href="/bootstrap-5.3.3-dist/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" href="/styles/home.css" />
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Left Sidebar -->
+                <div class="col-2 left-col">
+                    <h4 class="mb-4">
+                        <i class="fa-brands fa-twitter"></i> Twit
+                    </h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="/home" class="nav-link text-light active"
+                                >Home</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/profile" class="nav-link text-light"
+                                >Profile</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/friends" class="nav-link text-light"
+                                >Friends</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/messages" class="nav-link text-light"
+                                >Messages</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/notifications" class="nav-link text-light"
+                                >Notifications</a
+                            >
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/settings" class="nav-link text-light"
+                                >Settings</a
+                            >
+                        </li>
+                    </ul>
+                    <button id="toggleTheme" class="btn btn-outline-light mt-3">
+                        Toggle Theme
+                    </button>
+                </div>
+
+                <!-- Main Feed -->
+                <div class="col-8 middle-col">
+                    <div class="post-box mb-4">
+                        <form class="form" action="/create" method="post">
+                            <div class="mb-3">
+                                <label for="tweet" class="form-label"
+                                    >Twit</label
+                                >
+                                <textarea
+                                    class="form-control"
+                                    id="tweet"
+                                    name="tweet"
+                                    rows="3"
+                                    required
+                                    maxlength="250"
+                                    placeholder="What's happening?"
+                                    style="min-height: 120px"
+                                ></textarea>
+                                <div id="charCount" class="form-text mt-1">
+                                    0 / 250
+                                </div>
+                                <div
+                                    class="submit mt-3 d-flex justify-content-end"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary submit-btn"
+                                    >
+                                        Post
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="feed">
+                        <% posts.forEach(post => { %>
+                            <% if(post.removed === false) {%>
+                                <div class="tweet" id="<%= post.pid%>">
+                                    <div class="tweet-author">
+                                        <%= post.users.username %>
+                                        <span class="tweet-time"> <%= post.date2 %></span>
+                                    </div>
+                                    <div class="word-wrap"><%= post.content %></div>
+                                    <div class="info mt-2 d-flex gap-3 text-muted small">
+                                        <span
+                                            ><i class="fa-solid fa-heart"></i><%= post.likes
+                                            %></span
+                                        >
+                                        <span
+                                            ><i class="fa-solid fa-eye"></i><%= post.views
+                                            %></span
+                                        >
+                                        <span
+                                            ><i class="fa-solid fa-share-nodes"></i><%=
+                                            post.shares %></span
+                                        >
+                                    </div>
+                                </div>
+                        <% } %>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar (removed trends) -->
+                <div class="col-2 right-col">
+                    <!-- Empty or maybe future stuff -->
+                </div>
+            </div>
+        </div>
+
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/420dd176dc.js"
+            crossorigin="anonymous"
+        ></script>
+        <script src="/scripts/themeChange.js"></script>
+        <script src="/scripts/home.js"></script>
+        <script src="/scripts/createPost.js"></script>
+    </body>
+</html>

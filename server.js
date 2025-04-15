@@ -40,11 +40,48 @@ app.get('/', (req, res) => {
     res.redirect('/login');
 });
 
-app.get('/home', (req, res) => {
+app.get('/home', async (req, res) => {
     if (!req.session.user) {
         return res.redirect('/login');
     }
-    res.sendFile(__dirname + '/public/home.html');
+
+    const { data, error } = await supabase.from('posts').select(`
+        *,
+        users:uid (
+          username
+        )
+          `);
+
+    data.forEach((el) => {
+        el.date2 = formatTimeAgo(el.date).timeAgo;
+    });
+
+    const { data: removedPosts, error: err } = await supabase
+        .from('removed_posts')
+        .select('*');
+
+    if (err) {
+        console.log(err);
+        console.log('Error fetching removed posts');
+    }
+
+    let dict = {};
+    removedPosts.forEach((post) => {
+        dict[post.pid] = 1;
+    });
+
+    data.forEach((post) => {
+        if (dict[post.pid]) post.removed = true;
+        else post.removed = false;
+    });
+
+    if (error) {
+        return res.status(500).send('Error Joining Tables');
+    }
+
+    data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.render('home.ejs', { posts: data });
 });
 
 app.get('/login', (req, res) => {
@@ -1419,29 +1456,6 @@ app.get('/api/user', (req, res) => {
     }
 
     res.json({ username: req.session.user.username, ID: req.session.user.ID });
-});
-
-app.get('/api/posts', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Not logged in' });
-    }
-
-    const { data, error } = await supabase.from('posts').select(`
-    *,
-    users:uid (
-      username
-    )
-  	`);
-
-    data.forEach((el) => {
-        el.date2 = formatTimeAgo(el.date).timeAgo;
-    });
-
-    if (error) {
-        return res.status(500).send('Error Joining Tables');
-    } else {
-        res.json({ data: data });
-    }
 });
 
 app.use((req, res, next) => {
